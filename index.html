@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>容積代金檢核教室</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
+<style>
+/* 版面：單欄工作台，頂部分頁，手機優先；結果先於明細 */
+:root{--ink:#16282e;--mut:#5b6b70;--bg:#f4f5f3;--card:#fff;--line:#d9dedc;--teal:#2C5460;--brick:#B85042;--camel:#B0A890;--ok:#2f7d5b;--note:#a8730f;--warn:#b3392c;--tint:#e8eeee;
+--body:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;--disp:"Noto Serif TC","Microsoft JhengHei",serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#e6ecec;--mut:#9fb0b4;--bg:#101a1d;--card:#182428;--line:#2c3c41;--teal:#7fb4c2;--brick:#e08a7d;--camel:#c9c1a8;--ok:#6fc49b;--note:#e0b458;--warn:#ef8377;--tint:#1f3035;color-scheme:dark}}
+:root[data-theme="dark"]{--ink:#e6ecec;--mut:#9fb0b4;--bg:#101a1d;--card:#182428;--line:#2c3c41;--teal:#7fb4c2;--brick:#e08a7d;--camel:#c9c1a8;--ok:#6fc49b;--note:#e0b458;--warn:#ef8377;--tint:#1f3035;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);font-variant-numeric:tabular-nums}
+header{background:var(--teal);color:var(--bg);padding:14px 16px 0}
+header h1{font:700 20px/1.3 var(--disp);margin:0;text-wrap:balance}
+header p{margin:2px 0 10px;font-size:12px;opacity:.85}
+nav{display:flex;gap:2px;overflow-x:auto}
+.tab{flex:none;border:0;background:transparent;color:inherit;font:500 14px var(--body);padding:9px 12px;border-radius:8px 8px 0 0;opacity:.75;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--bg);color:var(--ink);opacity:1}
+main{max-width:860px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+section{display:flex;flex-direction:column;gap:14px}section[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+h2{font:700 16px var(--body);margin:0 0 8px}h3{font:700 16px/1.5 var(--body);margin:0 0 10px;text-wrap:balance}
+h4{margin:14px 0 4px;font-size:13px;color:var(--teal);letter-spacing:.08em}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column}
+.kpi.main{grid-column:1/-1;border-left:5px solid var(--brick)}
+.kpi span{font-size:12px;color:var(--mut)}.kpi b{font-size:19px}.kpi.main b{font-size:26px}.kpi small{font-size:12px;color:var(--mut);font-weight:400}.kpi em{font-style:normal;font-size:11px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:2px}
+.u{font-style:normal;margin-left:4px;opacity:.7;font-size:11px}
+input[type=number],input[type=text],input[type=password],select,textarea{font:15px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 8px;width:100%;min-width:0}
+input:focus-visible,button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--brick);outline-offset:1px}
+.pair{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center;margin-bottom:5px;font-size:13px}
+.pair.head b{font-size:12px;color:var(--mut);text-align:center}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th{text-align:left;color:var(--mut);font-weight:500}
+#rules td{white-space:normal;text-align:left;vertical-align:top}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:700;margin-right:6px;color:var(--card)}
+.pill.warn{background:var(--warn)}.pill.note{background:var(--note)}.pill.ok{background:var(--ok)}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.chk{border:1px solid var(--line);border-left-width:5px;border-radius:8px;padding:9px 11px;background:var(--card)}
+.chk.warn{border-left-color:var(--warn)}.chk.note{border-left-color:var(--note)}.chk.ok{border-left-color:var(--ok)}
+.chk .row{display:flex;gap:8px;align-items:baseline}.chk strong{font-weight:500}
+.hint{margin:8px 0 0;padding:8px 10px;background:var(--tint);border-radius:6px;font-size:14px}.hint b{display:block;font-size:11px;color:var(--teal);letter-spacing:.06em}
+cite{display:block;font-style:normal;font-size:11px;color:var(--mut);margin-top:4px}
+.link{border:0;background:none;color:var(--teal);font:500 13px var(--body);padding:6px 0 0;cursor:pointer;text-decoration:underline}
+.btn{border:1px solid var(--teal);background:var(--teal);color:var(--bg);font:500 14px var(--body);padding:9px 14px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--teal)}.btn:disabled{opacity:.4}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+#sens-ctl{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+#sens-ctl label{flex-direction:row;flex-wrap:wrap;justify-content:space-between;font-size:13px;color:var(--ink)}#sens-ctl input{width:100%;accent-color:var(--brick)}
+#sens-out{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline}#sens-out b{font-size:24px}#sens-out em{font-style:normal;color:var(--mut);font-size:12px}
+.up{color:var(--warn);font-weight:700}.dn{color:var(--ok);font-weight:700}
+.tr{display:grid;grid-template-columns:minmax(0,9em) 1fr minmax(0,8.5em);gap:8px;align-items:center;font-size:12px;margin-bottom:6px}
+.bar{position:relative;height:14px;background:var(--tint);border-radius:3px}.bar:before{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--mut)}
+.bar i{position:absolute;top:0;bottom:0;background:var(--brick);border-radius:3px}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);font:15px var(--body);padding:10px 12px;border-radius:8px;margin-bottom:8px;cursor:pointer}
+.opt.right{border-color:var(--ok);background:var(--tint)}.opt.wrong{border-color:var(--warn)}
+.qn{margin:0;font-size:12px;color:var(--mut)}.nav{display:flex;justify-content:space-between;margin-top:8px}
+.tick{flex-direction:row;gap:8px;align-items:flex-start;font-size:14px;color:var(--ink);padding:5px 0}
+.plain li.ok{color:var(--ok)}.plain li.warn{color:var(--warn)}.plain li.note{color:var(--note)}
+#ai-out{white-space:pre-wrap;min-height:3em}
+textarea{min-height:140px;font-size:12px}#ai-ans,#ai-fix{font-size:14px}
+footer{max-width:860px;margin:0 auto;padding:0 16px 28px;font-size:11px;color:var(--mut)}
+p{margin:0}
+</style>
+</head>
+<body>
+<header>
+<h1>容積代金檢核教室</h1>
+<p>政大地政「都市更新與容積代金估價實務」115-1　雙情境土地開發分析法</p>
+<nav role="tablist">
+<button class="tab" role="tab" data-t="calc" aria-selected="true">試算與檢核</button>
+<button class="tab" role="tab" data-t="sens" aria-selected="false">敏感度</button>
+<button class="tab" role="tab" data-t="quiz" aria-selected="false">判斷題</button>
+<button class="tab" role="tab" data-t="review" aria-selected="false">審查</button>
+<button class="tab" role="tab" data-t="ai" aria-selected="false">AI 助教</button>
+<button class="tab" role="tab" data-t="rules" aria-selected="false">兩市規則</button>
+</nav>
+</header>
+<main>
+<div class="card" id="who"><div class="grid"><label for="who-sid">學號<input id="who-sid" type="text" autocomplete="off" maxlength="12"></label><label for="who-grp">組別<input id="who-grp" type="text" autocomplete="off" maxlength="20"></label></div><p id="who-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
+<section id="calc">
+<div class="kpis" id="kpi"></div>
+<div class="card"><h2>檢核結果　<span id="sum"></span></h2><ul id="checks"></ul>
+<div id="rv-box" hidden><p class="hint"><b>你是協檢委員</b>下面哪些是本案應提出的審查意見？看完參數再勾選。</p><div id="rv-list"></div><div class="btns"><button class="btn" id="rv-grade">送出審查意見</button></div><div id="rv-out"></div></div></div>
+<div class="card"><h2 id="casename"></h2>
+<div class="grid"><label for="city">適用規則<select id="city"><option value="tpe">臺北市</option><option value="ntpc">新北市</option></select></label></div>
+<p id="ruleset" style="font-size:11px;color:var(--mut);margin:4px 0 10px"></p>
+<div class="grid" id="f-common"></div><div id="f-scen"></div>
+<div class="btns" style="margin-top:10px"><button class="btn ghost" id="load-base">還原示範案</button></div>
+<h4>本組參數存取</h4><div class="grid"><label for="case-pin">組密碼（4 碼以上，第一次儲存時設定）<input id="case-pin" type="password" autocomplete="off"></label></div><div class="btns" style="margin-top:8px"><button class="btn" id="case-save">儲存本組參數</button><button class="btn ghost" id="case-load">載入本組參數</button></div><p id="case-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
+<div class="card"><h2>計算過程</h2><p style="font-size:12px;color:var(--mut)">V＝S÷(1＋R)÷(1＋i)−(C＋M)；單價取位至千位；總價＝單價×土地坪數</p>
+<div class="scroll"><table><thead><tr><th></th><th>總銷 S</th><th>直接成本 C</th><th>間接成本 M</th><th>土地總價 V</th><th>單價(元/坪)</th><th>決定總價</th></tr></thead><tbody id="steps"></tbody></table></div></div>
+</section>
+<section id="sens" hidden>
+<div class="card"><h2>拉動參數，看代金怎麼變</h2><p style="font-size:13px;color:var(--mut);margin-bottom:10px">調整同時套用於容移前、後兩個情境。</p><div id="sens-ctl"></div><div class="btns" style="margin:12px 0"><button class="btn ghost" id="sens-reset">歸零</button></div><div id="sens-out"></div></div>
+<div class="card"><h2>哪個參數最敏感</h2><div id="tornado"></div><p class="hint"><b>想一想</b>售價變動 5% 對代金的影響，為什麼遠大於 5%？這就是剩餘法的槓桿：土地價格是總銷扣掉成本與利潤後的殘值，代金又是兩個殘值的差。</p></div>
+</section>
+<section id="quiz" hidden><div class="card" id="quiz"></div></section>
+<section id="review" hidden>
+<div class="card"><h2>角色翻轉：你來當協檢委員</h2><p>載入一份有瑕疵的代金參數表。燈號會關閉，請自行判讀後勾選應提出的審查意見。漏審與誤判都會被記錄。</p><div class="btns" style="margin-top:12px"><button class="btn" data-review="flaw1">審查待審案 A</button><button class="btn" data-review="flaw2">審查待審案 B</button></div></div>
+<div class="card"><h2>審查同學的案子</h2><p>請對方把參數輸入「試算與檢核」分頁，你先不看燈號，口頭提出三點意見，再對照檢核結果。審查意見的品質列入平時成績。</p></div>
+</section>
+<section id="ai" hidden>
+<div class="card"><h2>用目前案件資料問 AI</h2><p id="ai-note" style="font-size:13px;color:var(--mut)">此頁會把目前參數與檢核結果組成提示詞。</p>
+<div class="btns" style="margin:10px 0"><button class="btn" data-ai="grill">模擬委員質詢我</button><button class="btn ghost" data-ai="explain">解釋未通過項目</button><button class="btn ghost" data-ai="memo">草擬審查意見</button></div>
+<div id="ai-out" class="hint">選一個模式開始。</div></div>
+<div class="card"><h2>提示詞</h2><textarea id="ai-prompt" aria-label="提示詞" readonly></textarea><div class="btns" style="margin-top:8px"><button class="btn ghost" id="ai-copy">複製提示詞</button></div>
+<h4>AI 使用紀錄</h4><label for="ai-ans">AI 的回答（貼上）<textarea id="ai-ans"></textarea></label><label for="ai-fix" style="margin-top:8px">我查證後的修正（AI 哪裡說錯、依據是什麼）<textarea id="ai-fix" style="min-height:80px"></textarea></label><div class="btns" style="margin-top:8px"><button class="btn" id="ai-save">存入使用紀錄</button></div><p id="ai-save-msg" style="font-size:12px;color:var(--mut);margin:6px 0"></p>
+<p class="hint"><b>使用規則</b>AI 的回答可能引用舊版或別的縣市的規定。報告須附「AI 使用紀錄」：問了什麼、AI 答了什麼、你查證後修正了什麼。抓到 AI 的錯誤可加分。</p></div>
+</section>
+<section id="rules" hidden><div class="card" id="rules"><h2>臺北市與新北市規則對照</h2><div class="scroll"><table><thead><tr><th>項目</th><th>臺北市</th><th>新北市</th></tr></thead><tbody id="rules-body"></tbody></table></div></div></section>
+</main>
+<footer>教學用工具，檢核門檻依課程講義整理，非審議依據。實際案件以主管機關現行範本及審議決議為準。</footer>
+<script>
+/* 容積代金雙情境計算與檢核引擎。規則庫 RULES 與計算分離，換縣市或年度版本只改 RULES。 */
+const PING = 0.3025;
+const RULES = {
+  tpe: {
+    name: '臺北市', ver: '114年範本（114.10.30 教育訓練版）',
+    ratioDecimals: (bulkM2) => bulkM2 > 20000 ? 3 : 2,
+    profit: [[0,1.5,12,13],[1.5,2,13,14],[2,2.5,14,15],[2.5,3,15,16],[3,3.5,16,17],[3.5,4,17,18],[4,4.5,18,19],[4.5,5,19,20]],
+    profitOver5: '開發年期5年以上，每增加0.5年加計1%~2%',
+    reviewInYears: false,
+    reviewNote: '容移前、後均不計都市更新審議期間及容積代金審議期間',
+    digCut: 10, caseAgeYears: 3, priceDate: '依委託及都審核定版本',
+    src: { profit: '臺北市範本 土地開發分析法-利潤率表', dig: '臺北市審議原則自主檢核表「容移前地下室車位數量設置原則」', years: '107年共識會議結論', ratio: '臺北市範本 內文型式', result: '審議原則自主檢核表「評估結果」' }
+  },
+  ntpc: {
+    name: '新北市', ver: '113年作業注意事項與審議重點（113.9.24）',
+    ratioDecimals: () => 3,
+    profit: null, profitOver5: '',
+    reviewInYears: true,
+    reviewNote: '有都更、都審、開放空間、工業區立體化審查者，依表於土地開發年期或建物工期加計審查期間',
+    digCut: null, caseAgeYears: 5, priceDate: '申請估價收件日',
+    smallScalePing: 2500,
+    src: { years: '新北市113年注意事項 土開法重要原則(3)', ratio: '新北市113年注意事項 土開法重要原則(1)', small: '新北市113年注意事項 土開法重要原則(5)', fund: '新北市113年注意事項 土開法重要原則(2)' }
+  },
+  indirect: { design: [2,3], adv: [3,7], mgmt: [4,5], tax: [0.5,1.2], src: '示範計算檔備註（依第四號公報）【費率區間請回查公報原文】' },
+  green: { 鑽石級: [3500,4500], 黃金級: [2000,3000], '銀級/銅級/合格級': [500,1800] },
+  smart: { '鑽石級/黃金級': [3.5,4.2], 銀級: [1.5,1.9], 銅級: [0.6,0.8] }
+};
+
+function scen(s, landPing) {
+  const S = s.resArea * s.resPrice + (s.shopArea||0) * (s.shopPrice||0) + s.parkN * s.parkPrice;
+  const direct = s.cost * s.regArea;
+  const M = direct * s.design/100 + S * (s.adv + s.mgmt + s.tax)/100;
+  const V = Math.round(S / (1 + s.R/100) / (1 + s.i/100) - (direct + M));
+  const unit = Math.round(V / landPing / 1000) * 1000;
+  return { S, direct, M, V, unit, total: unit * landPing, sellArea: s.resArea + (s.shopArea||0) };
+}
+
+function calc(c) {
+  const landPing = c.landM2 * PING, inPing = c.inM2 * PING;
+  const a = scen(c.aft, landPing), b = scen(c.bef, landPing);
+  const fee = a.total - b.total;
+  const feePerPing = fee / inPing;
+  const volUnitAft = a.unit / (c.farAft/100);
+  const avgRes = c.aft.resPrice;
+  return {
+    landPing, inPing, a, b, fee, feePerPing,
+    mktRatio: feePerPing / volUnitAft, priceRatio: feePerPing / avgRes,
+    ratioA: a.sellArea / (landPing * c.farAft/100), ratioB: b.sellArea / (landPing * c.farBef/100),
+    dS: a.S - b.S, dC: (a.direct + a.M) - (b.direct + b.M), dDirect: a.direct - b.direct
+  };
+}
+
+function profitBand(city, years) {
+  const t = RULES[city].profit; if (!t) return null;
+  for (const [lo, hi, p1, p2] of t) if (years >= lo && years < hi) return [p1, p2];
+  const steps = Math.floor((years - 5) / 0.5);
+  return [20 + steps * 1, 20 + (steps + 1) * 2]; // 5年以上：20%起，每0.5年加計1%~2%
+}
+
+function check(c) {
+  const r = calc(c), R = RULES[c.city], A = c.aft, B = c.bef, out = [];
+  const add = (id, level, title, h1, h2, h3, src) => out.push({ id, level, title, h: [h1, h2, h3], src });
+  const fmt = (x, d = 2) => Number(x).toFixed(d);
+
+  // 1 銷坪比一致
+  const bulk = A.regArea / PING, dec = R.ratioDecimals(bulk);
+  const ra = +r.ratioA.toFixed(dec), rb = +r.ratioB.toFixed(dec), gap = Math.abs(r.ratioA - r.ratioB);
+  add('ratio', gap > 0.01 ? 'warn' : (ra !== rb ? 'note' : 'ok'), `銷坪比：容移後 ${fmt(r.ratioA,3)}／容移前 ${fmt(r.ratioB,3)}`,
+    '比較兩情境的「不含車位銷售面積 ÷ 容積樓地板面積」。',
+    `${R.name}要求容移前後銷坪比一致，取位至小數點後 ${dec} 位。兩者差 ${fmt(gap,3)}。`,
+    '先檢查容移前的銷售面積是否由容移後銷坪比反推，再看免計容積（梯廳、陽臺、機電）在兩情境的比例是否同一套假設。', R.src.ratio);
+
+  // 2 建蔽率一致
+  add('bcr', A.bcr !== B.bcr ? 'warn' : 'ok', `實設建蔽率：容移後 ${A.bcr}%／容移前 ${B.bcr}%`,
+    '看兩情境的地面層規劃。', '容移前後應維持一致之實設建蔽率，減少之容積由頂層依次遞減。',
+    '容移前情境不是重新設計一棟樓，而是把容移後方案「削頂」。建蔽率改了，等於換了一個產品。', '臺北市審議原則自主檢核表「一致性原則」');
+
+  // 3 樓層
+  add('floors', B.floorsUp > A.floorsUp ? 'warn' : (B.floorsUp === A.floorsUp ? 'note' : 'ok'), `地上樓層：容移後 ${A.floorsUp}F／容移前 ${B.floorsUp}F`,
+    '移入容積去了哪裡？', '建蔽率相同時，移入容積應反映為樓層數增加。', '若樓層沒變，請說明移入容積如何消化（單層面積變大即建蔽率不一致）。', '臺北市範本「開發量體及產品規劃」');
+
+  // 4 地下室
+  const cutFloors = A.floorsDown - B.floorsDown, cut = A.digRate ? (A.digRate - B.digRate) / A.digRate * 100 : 0;
+  let lv = 'ok', h2 = '';
+  if (cutFloors > 0 && Math.abs(A.digRate - B.digRate) > 0.001) { lv = 'warn'; h2 = '已減少地下樓層，原則上應維持與容移後相同之開挖率。'; }
+  else if (cutFloors === 0 && R.digCut && cut > R.digCut) { lv = 'warn'; h2 = `開挖率縮減 ${fmt(cut,1)}%，超過容移後開挖率之 ${R.digCut}%（例：70% 不宜低於 63%），超過時以刪減一層為原則。`; }
+  else if (cutFloors < 0 || cut < 0) { lv = 'warn'; h2 = '容移前地下室規模大於容移後，方向相反。'; }
+  else h2 = cutFloors > 0 ? '減層且開挖率一致，符合原則。' : `開挖率縮減 ${fmt(cut,1)}%。`;
+  add('dig', lv, `地下室：容移後 B${A.floorsDown}、${A.digRate}%／容移前 B${B.floorsDown}、${B.digRate}%`,
+    '容移前的地下室是「減層」還是「縮開挖率」？兩者只能擇一為主。', h2,
+    '回到銷坪比：地下室的調整是為了讓容移前銷坪比與容移後一致，並同時檢視容移前車位銷售面積是否合理。', R.src.dig || RULES.tpe.src.dig);
+
+  // 5 車位
+  if (c.legalPark > 0) add('park', B.parkN < c.legalPark ? 'warn' : 'ok', `容移前車位 ${B.parkN} 個／法定 ${c.legalPark} 個`,
+    '容移前的車位數從哪裡來？', '容移前應至少滿足法定車位，滿足後之剩餘空間視為增設車位。', '法定車位隨容移前樓地板面積重算，不是直接沿用容移後的數字。', RULES.tpe.src.dig);
+
+  // 6 利潤率
+  for (const [k, s, nm] of [['a', A, '容移後'], ['b', B, '容移前']]) {
+    const band = profitBand(c.city, s.years);
+    if (band) add('profit_' + k, (s.R < band[0] || s.R > band[1]) ? 'warn' : 'ok', `${nm}利潤率 ${s.R}%（開發年期 ${s.years} 年）`,
+      '利潤率與開發年期是連動的。', `開發年期 ${s.years} 年對應建議區間 ${band[0]}%~${band[1]}%。設定不同時應予說明。`,
+      '先確認開發年期算對（審議期間計不計入），再查表。', R.src.profit);
+  }
+  if (!R.profit) add('profit_n', 'note', '新北市利潤率', '新北市注意事項未附臺北式之利潤率對照表。', '請依第四號公報及個案開發年期說明利潤率之決定。', '可用臺北市對照表做交叉檢視，但報告書依據應引新北市規定。', '第四號公報');
+  add('profit_gap', A.R < B.R ? 'warn' : 'ok', `利潤率差：容移後 ${A.R}%／容移前 ${B.R}%`, '哪一個情境開發期比較長？', '容移後量體較大、年期較長，利潤率不應低於容移前。', '同一套邏輯套兩個情境：年期差多少，利潤率級距就差多少。', '審議原則「容移前後一致之參數邏輯」');
+
+  // 7 開發年期
+  add('years', A.years < B.years ? 'warn' : 'ok', `開發年期：容移後 ${A.years} 年／容移前 ${B.years} 年`, '樓層多的那一棟，工期應該比較長還是比較短？', R.reviewNote + '。', R.reviewInYears ? '新北市與臺北市在審議期間的處理相反，引用前先確認案件所在縣市。' : '年期只差在地上、地下樓層數造成的施工月數。', R.src.years);
+
+  // 8 間接費率一致與區間
+  const names = { design: '規劃設計費', adv: '廣告銷售費', mgmt: '管理費', tax: '稅捐' };
+  const diff = Object.keys(names).filter(k => A[k] !== B[k]);
+  add('ind_same', diff.length ? 'warn' : 'ok', '間接成本費率一致性' + (diff.length ? `：${diff.map(k => names[k]).join('、')}不一致` : ''),
+    '兩情境的費率欄逐一對照。', '規劃設計費等各項間接成本，容移前後費用率應一致。', '費率不同會把「參數差」混進代金，代金就不再只反映容積差。', '臺北市範本「土地開發分析法-造價成本」原則');
+  const off = Object.keys(names).filter(k => A[k] < RULES.indirect[k][0] || A[k] > RULES.indirect[k][1]);
+  add('ind_range', off.length ? 'note' : 'ok', '間接成本費率區間' + (off.length ? `：${off.map(k => names[k] + A[k] + '%').join('、')}超出常用區間` : ''),
+    '對照四號公報的費率區間。', `常用區間：規劃設計 2~3%、廣告銷售 3~7%、管理費 4~5%、稅捐 0.5~1.2%。`, '超出區間不必然錯，但報告書要有說明。', RULES.indirect.src);
+
+  // 9 造價
+  add('cost', B.cost > A.cost ? 'warn' : 'ok', `營造施工費：容移後 ${A.cost.toLocaleString()}／容移前 ${B.cost.toLocaleString()} 元/坪`,
+    '樓層較低的建物，單位造價通常如何？', '營造單價之區間決定方式應一致；容移前樓層較低，造價級距不應高於容移後。', '例外：縮減後樓層落入次一級距時，得參酌該級距臨界值推估。', '臺北市範本「土地開發分析法-造價成本」');
+
+  // 10 售價與成本
+  const dp = A.resPrice - B.resPrice, dc = A.cost - B.cost;
+  add('price', dp < 0 ? 'warn' : (dc > 0 && dp > dc * 1.5 ? 'note' : 'ok'), `住宅均價差 ${dp.toLocaleString()}／造價差 ${dc.toLocaleString()} 元/坪`,
+    '均價為什麼不同？是樓層效用，還是把造價轉嫁給售價？', '比準戶單價原則上不因總樓層數差異而調整；均價差應來自新增高樓層之樓層別效用。成本增加不等於價值增加。',
+    '把容移後新增樓層的效用比加權算一次，看均價差是否對得上。', '114期末考第8題；示範檔「比準戶原則不依總樓層數差異調整」');
+
+  // 11 評估結果
+  add('result', r.dS > r.dDirect ? 'ok' : 'warn', `總銷增額 ${Math.round(r.dS).toLocaleString()}／總造價增額 ${Math.round(r.dDirect).toLocaleString()} 元`,
+    '多蓋的那幾層，賣得的錢有沒有大於蓋的錢？', '檢核式：〔容移後總銷−容移前總銷〕>〔容移後總造價−容移前總造價〕。', '不成立代表移入容積沒有經濟價值，通常是售價或造價其中一邊設錯。', RULES.tpe.src.result);
+
+  // 12 代金方向與比例
+  add('fee', r.fee <= 0 ? 'warn' : 'ok', `代金 ${Math.round(r.fee).toLocaleString()} 元`, '兩情境基地總價相減。', '代金＝含容積移入之基地價格−未含容積移入之基地價格，應為正值。', '負值先查利潤率、利率與造價三項是否在容移後被重複加碼。', '臺北市範本基本公式');
+  add('mkt', (r.mktRatio > 1.05 || r.mktRatio < 0.5) ? 'note' : 'ok', `代金市價比 ${fmt(r.mktRatio,4)}`,
+    '代金容積單價 ÷ 容移後基地之容積單價。', '邊際容積的價值通常不高於平均容積單價（使用強度達邊際效益遞減時，容積率越高、容積單價越低）。',
+    '0.5 與 1.05 為本工具之教學門檻，非審議標準。偏離時請用敏感度分析找出是哪個參數造成。', '摘要表「容積代金與市價比例關係」；門檻為教學設定');
+
+  // 13 新北小規模
+  if (c.city === 'ntpc') add('small', A.regArea < R.smallScalePing ? 'note' : 'ok', `容移後總登記面積 ${fmt(A.regArea,0)} 坪`,
+    '量體有沒有達到營建經濟規模？', `容移後含車位總登記面積小於 ${R.smallScalePing} 坪者，依四號公報第16條於容移前後一同加價（建議10%以上）並敘明過程。`, '加價要兩情境一起加，只加一邊就是不一致。', R.src.small);
+  return { r, checks: out };
+}
+
+/* 預載案例。base＝114上期末考計算題（新北市板橋區江翠段模擬案），flaw1/flaw2 為審查者模式之瑕疵案例。 */
+const CASES = {
+  base: {
+    name: '示範案：新北市板橋區江翠段（114上期末考計算題）', city: 'ntpc',
+    landM2: 1100, inM2: 1056, farLegal: 240, farBef: 276, farAft: 372, legalPark: 0,
+    aft: { floorsUp: 14, floorsDown: 4, digRate: 65, bcr: 50, resArea: 2027.81, resPrice: 651000, shopArea: 0, shopPrice: 0, parkN: 50, parkPrice: 2300000, regArea: 2575.809, cost: 166000, design: 2, adv: 4, mgmt: 4, tax: 1, years: 3.2, R: 16, i: 5.69 },
+    bef: { floorsUp: 11, floorsDown: 3, digRate: 65, bcr: 50, resArea: 1509.72, resPrice: 642000, shopArea: 0, shopPrice: 0, parkN: 36, parkPrice: 2350000, regArea: 1934.162, cost: 154000, design: 2, adv: 4, mgmt: 4, tax: 1, years: 2.6, R: 15, i: 4.69 }
+  }
+};
+const clone = o => JSON.parse(JSON.stringify(o));
+CASES.flaw1 = (() => { const c = clone(CASES.base); c.name = '待審案 A（臺北市，模擬）'; c.city = 'tpe';
+  c.bef.floorsDown = 4; c.bef.digRate = 52; c.bef.R = 17; c.bef.adv = 5; c.bef.resPrice = 620000; c.legalPark = 40; return c; })();
+CASES.flaw2 = (() => { const c = clone(CASES.base); c.name = '待審案 B（臺北市，模擬）'; c.city = 'tpe';
+  c.bef.bcr = 55; c.bef.cost = 170000; c.aft.R = 14; c.bef.digRate = 60; c.aft.years = 3.2; return c; })();
+
+/* 審查者模式的候選意見：id 對應引擎檢核項目，學生勾選後與引擎結果比對 */
+const REVIEW_ITEMS = [
+  ['ratio', '容移前後銷坪比不一致'], ['bcr', '實設建蔽率前後不一致'], ['dig', '容移前地下室開挖率或樓層調整不符原則'],
+  ['park', '容移前車位數未滿足法定車位'], ['profit_a', '容移後利潤率與開發年期不對應'], ['profit_b', '容移前利潤率與開發年期不對應'],
+  ['profit_gap', '容移後利潤率低於容移前'], ['ind_same', '間接成本費率前後不一致'], ['cost', '容移前營造單價高於容移後'],
+  ['price', '住宅均價差距缺乏樓層效用支撐'], ['result', '總銷增額未大於總造價增額'], ['years', '開發年期前後邏輯不合']
+];
+
+const QUIZ = [
+  { q: '臺北市接受基地之移入容積，以繳納代金方式辦理的比例下限為何？', o: ['30%', '50%', '70%', '可自由選擇'], a: 1, e: '臺北市移入容積應有 50% 以上以繳納代金辦理，其餘可採捐贈公保地；新北市可自由選擇。', s: '114上期末考第1題' },
+  { q: '業主的容移後方案是 B4、開挖率 70%。你建構容移前情境時決定「不減層、只縮開挖率」。下列何者符合臺北市原則？', o: ['開挖率 55%', '開挖率 60%', '開挖率 64%', '開挖率不得調整'], a: 2, e: '縮減幅度以不超過容移後開挖率之 10% 為原則，70% 不宜低於 63%；超過時以刪減一層為原則。', s: '臺北市審議原則自主檢核表' },
+  { q: '同上案，若你改採「刪減一層地下室」，開挖率應如何處理？', o: ['同步縮減 10%', '維持與容移後相同', '提高以補足車位', '由估價師自由決定'], a: 1, e: '優先減少樓層數時，以維持與容移後相同之開挖率為原則。', s: '臺北市審議原則自主檢核表' },
+  { q: '臺北市案件屬都市更新案，都更審議預估 18 個月。計算土地開發年期時應如何處理？', o: ['全數計入', '計入一半', '容移前後均不計入', '只計入容移後'], a: 2, e: '容移前、後均不計都市更新年期，也不計容積代金審議期程。', s: '107年共識會議結論' },
+  { q: '同樣是都更案，但基地在新北市。審議期間的處理與臺北市相比如何？', o: ['相同，均不計入', '相反，新北市依表加計審查期間', '新北市只計代金審議', '兩市均由估價師自行決定'], a: 1, e: '新北市注意事項要求有都更、都審、開放空間、工業區立體化審查者，依表於土地開發年期或建物工期加計。跨縣市執業最容易在此出錯。', s: '新北市113年注意事項 土開法重要原則(3)' },
+  { q: '容移後 24 層、容移前 19 層，容移後營造單價較高。學生主張「造價高所以容移後每坪售價也應同步調高」。你的審查意見是？', o: ['同意，成本決定價格', '不同意，售價差應來自樓層別效用等效用因素，成本不等於價值', '同意，但只能調高 5%', '不同意，售價應完全相同'], a: 1, e: '比準戶單價原則上不因總樓層數差異調整；均價差應由新增高樓層之效用（視野、景觀）支撐。', s: '114上期末考第8題' },
+  { q: '比較法中，比較標的容積率與勘估標的不同。容積率調整率應如何求得？', o: ['按容積率比例直線調整', '以土地開發分析法試算兩容積率下之地價求得', '參考公告現值比', '一律調整 10%'], a: 1, e: '調整率＝勘估標的容積率土開試算價格÷比較標的容積率土開試算價格−1，並於附件詳列計算過程。', s: '臺北市範本 調整率注意事項' },
+  { q: '勘估標的容積率 420%。比較標的容積率差異分別為 86.7%、40%、20%。調整修正係數（調整率÷容積率差異）應呈現何種關係？', o: ['差異越大係數越大', '差異越大係數越小', '三者相同', '無一定關係'], a: 1, e: '使用強度達邊際效益遞減時，容積率越高、容積單價越低，容積率差異越大則修正係數越小。', s: '臺北市範本 調整率注意須知' },
+  { q: '臺北市範本中，開發年期 4.2 年的建議投資利潤率區間為何？', o: ['16%~17%', '17%~18%', '18%~19%', '19%~20%'], a: 2, e: '4.0 以上未滿 4.5 年對應 18%~19%。5 年以上每增加 0.5 年加計 1%~2%。', s: '臺北市範本 利潤率表' },
+  { q: '比較法選取建物成交案例時，臺北市與新北市對屋齡的原則分別是？', o: ['均為 3 年內', '臺北 3 年內、新北 5 年內', '臺北 5 年內、新北 3 年內', '均無限制'], a: 1, e: '臺北市以三年內新成屋為原則；新北市以五年內新成屋為原則，無適當案例得放寬並敘明理由。', s: '兩市範本及注意事項' },
+  { q: '本案申請黃金級綠建築與銀級智慧建築。依範本，造價應如何加計？', o: ['綠建築 2,000~3,000 元/坪；智慧建築為總工程造價 1.5%~1.9%', '兩者合計加 5%', '綠建築 3,500~4,500 元/坪；智慧建築 3.5%~4.2%', '不得加計'], a: 0, e: '綠建築以每坪金額加計，智慧建築以總工程造價比例加計，兩者計價基礎不同。', s: '114上期末考第5題；範本造價成本表' },
+  { q: '新北市案件，容移後含車位總登記面積 2,100 坪。造價應如何處理？', o: ['不需處理', '只在容移前加價', '依四號公報第16條於容移前後一同加價並敘明', '只在容移後加價'], a: 2, e: '未達營建經濟規模（經驗值 2,500 坪）者，容移前後一同加價，建議 10% 以上。只加一邊會破壞一致性。', s: '新北市113年注意事項 土開法重要原則(5)' },
+  { q: '審查時發現：容移後總銷增加 3.8 億元，總造價增加 4.1 億元。這代表什麼？', o: ['代金偏高', '移入容積不具經濟價值，售價或造價設定有誤', '正常現象', '應改用比較法'], a: 1, e: '檢核式要求總銷增額大於總造價增額，不成立時應回頭檢視售價與造價參數。', s: '審議原則自主檢核表「評估結果」' },
+  { q: '業主只提供容移後方案。估價師建構容移前情境時，減少的容積應從哪裡扣？', o: ['各樓層平均縮小', '由頂層依次遞減', '由低樓層扣除', '縮小基地面積'], a: 1, e: '實設建蔽率相同、減少容積由頂層依次遞減，目的是讓各估價師有一致的評估基礎，並非市場性規劃。', s: '臺北市範本 開發量體及產品規劃' }
+];
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const nf = (x, d = 0) => Number(x).toLocaleString('zh-TW', { maximumFractionDigits: d, minimumFractionDigits: d });
+const F_COMMON = [['landM2', '土地面積', '㎡'], ['inM2', '移入樓地板面積', '㎡'], ['farLegal', '法定容積率', '%'], ['farBef', '容移前允建容積率', '%'], ['farAft', '容移後允建容積率', '%'], ['legalPark', '容移前法定車位數（0＝不檢核）', '個']];
+const F_SCEN = [
+  ['量體', [['floorsUp', '地上樓層', '層'], ['floorsDown', '地下樓層', '層'], ['digRate', '開挖率', '%'], ['bcr', '實設建蔽率', '%'], ['regArea', '總登記面積（含車位）', '坪']]],
+  ['銷售', [['resArea', '住宅銷售面積', '坪'], ['resPrice', '住宅平均單價', '元/坪'], ['shopArea', '店面銷售面積', '坪'], ['shopPrice', '店面平均單價', '元/坪'], ['parkN', '銷售車位數', '個'], ['parkPrice', '車位平均單價', '元/個']]],
+  ['成本與報酬', [['cost', '營造施工費', '元/坪'], ['design', '規劃設計費（占營造費）', '%'], ['adv', '廣告銷售費（占總銷）', '%'], ['mgmt', '管理費（占總銷）', '%'], ['tax', '稅捐（占總銷）', '%'], ['years', '土地開發年期', '年'], ['R', '利潤率', '%'], ['i', '資本利息綜合利率', '%']]]
+];
+let state = clone(CASES.base), reviewMode = false, hintLv = {};
+try { const s = localStorage.getItem('tdr_state'); if (s) state = JSON.parse(s); } catch (e) {}
+const save = () => { try { localStorage.setItem('tdr_state', JSON.stringify(state)); } catch (e) {} };
+
+function buildForm() {
+  $('#f-common').innerHTML = F_COMMON.map(([k, l, u]) => `<label for="c_${k}">${l}<span class="u">${u}</span><input id="c_${k}" data-k="${k}" type="number" inputmode="decimal" step="any"></label>`).join('');
+  $('#f-scen').innerHTML = F_SCEN.map(([g, fs]) => `<h4>${g}</h4><div class="pair head"><span></span><b>容移後</b><b>容移前</b></div>` +
+    fs.map(([k, l, u]) => `<div class="pair"><span>${l}<i class="u">${u}</i></span><input id="a_${k}" data-s="aft" data-k="${k}" type="number" inputmode="decimal" step="any" aria-label="容移後${l}"><input id="b_${k}" data-s="bef" data-k="${k}" type="number" inputmode="decimal" step="any" aria-label="容移前${l}"></div>`).join('')).join('');
+  $$('#calc input').forEach(el => el.addEventListener('input', () => {
+    const v = parseFloat(el.value); if (isNaN(v)) return;
+    if (el.dataset.s) state[el.dataset.s][el.dataset.k] = v; else state[el.dataset.k] = v;
+    save(); render();
+  }));
+  $('#city').addEventListener('change', e => { state.city = e.target.value; save(); render(); });
+}
+function fillForm() {
+  F_COMMON.forEach(([k]) => $('#c_' + k).value = state[k]);
+  F_SCEN.forEach(([, fs]) => fs.forEach(([k]) => { $('#a_' + k).value = state.aft[k]; $('#b_' + k).value = state.bef[k]; }));
+  $('#city').value = state.city; $('#casename').textContent = state.name;
+}
+function loadCase(k) { state = clone(CASES[k]); hintLv = {}; save(); fillForm(); render(); }
+
+function render() {
+  const { r, checks } = check(state), R = RULES[state.city];
+  $('#ruleset').textContent = `${R.name}｜${R.ver}`;
+  $('#kpi').innerHTML = [
+    ['容積代金', nf(r.fee) + ' 元', '容移後總價 − 容移前總價'],
+    ['基地單價', `${nf(r.a.unit)}<small> ← ${nf(r.b.unit)}</small>`, '元/坪，容移後 ← 容移前'],
+    ['代金市價比', r.mktRatio.toFixed(4), '代金容積單價 ÷ 容移後容積單價'],
+    ['代金房價比', r.priceRatio.toFixed(4), '代金容積單價 ÷ 住宅均價']
+  ].map(([t, v, s], i) => `<div class="kpi${i ? '' : ' main'}"><span>${t}</span><b>${v}</b><em>${s}</em></div>`).join('');
+  $('#steps').innerHTML = ['a', 'b'].map(k => { const x = r[k], s = k === 'a' ? state.aft : state.bef;
+    return `<tr><th>${k === 'a' ? '容移後' : '容移前'}</th><td>${nf(x.S)}</td><td>${nf(x.direct)}</td><td>${nf(x.M)}</td><td>${nf(x.V)}</td><td>${nf(x.unit)}</td><td>${nf(x.total)}</td></tr>`; }).join('');
+  const cnt = { warn: 0, note: 0, ok: 0 }; checks.forEach(c => cnt[c.level]++);
+  $('#sum').innerHTML = reviewMode ? '審查者模式：燈號已關閉，請自行判斷後到「審查」分頁作答。' :
+    `<span class="pill warn">警訊 ${cnt.warn}</span><span class="pill note">請說明 ${cnt.note}</span><span class="pill ok">符合 ${cnt.ok}</span>`;
+  $('#checks').innerHTML = reviewMode ? '' : checks.map(c => { const lv = hintLv[c.id] || 0;
+    return `<li class="chk ${c.level}"><div class="row"><span class="dot"></span><strong>${c.title}</strong></div>` +
+      (c.level === 'ok' && !lv ? '' : c.h.slice(0, lv).map((h, i) => `<p class="hint"><b>提示 ${i + 1}</b>${h}${i === 1 ? `<cite>依據：${c.src}</cite>` : ''}</p>`).join('')) +
+      (lv < 3 ? `<button class="link" data-hint="${c.id}">${lv ? '再給一層提示' : (c.level === 'ok' ? '為什麼要檢核這項' : '給我提示')}（${lv}/3）</button>` : '') + `</li>`; }).join('');
+  $$('[data-hint]').forEach(b => b.onclick = () => { hintLv[b.dataset.hint] = (hintLv[b.dataset.hint] || 0) + 1; render(); });
+  renderSens(r);
+}
+
+/* 敏感度 */
+const SENS = [['price', '住宅均價', '%', 5], ['cost', '營造施工費', '%', 5], ['park', '車位單價', '%', 5], ['R', '利潤率', '個百分點', 1], ['i', '資本利息綜合利率', '個百分點', 1]];
+function shifted(d) { const c = clone(state);
+  for (const s of [c.aft, c.bef]) { s.resPrice *= 1 + (d.price || 0) / 100; s.shopPrice *= 1 + (d.price || 0) / 100; s.cost *= 1 + (d.cost || 0) / 100; s.parkPrice *= 1 + (d.park || 0) / 100; s.R += d.R || 0; s.i += d.i || 0; }
+  return calc(c).fee; }
+function renderSens(r) {
+  const d = {}; SENS.forEach(([k]) => d[k] = parseFloat($('#s_' + k).value)); SENS.forEach(([k, , u]) => $('#sv_' + k).textContent = (d[k] > 0 ? '+' : '') + d[k] + (u === '%' ? '%' : ' pp'));
+  const f = shifted(d), ch = (f - r.fee) / r.fee * 100;
+  $('#sens-out').innerHTML = `<b>${nf(f)} 元</b><span class="${ch < 0 ? 'dn' : 'up'}">${ch >= 0 ? '+' : ''}${ch.toFixed(1)}%</span><em>原代金 ${nf(r.fee)} 元</em>`;
+  const rows = SENS.map(([k, l, u, st]) => { const lo = (shifted({ [k]: -st }) - r.fee) / r.fee * 100, hi = (shifted({ [k]: st }) - r.fee) / r.fee * 100; return { l: `${l} ±${st}${u === '%' ? '%' : 'pp'}`, lo, hi, w: Math.max(Math.abs(lo), Math.abs(hi)) }; }).sort((a, b) => b.w - a.w);
+  const mx = Math.max(...rows.map(x => x.w), 1);
+  $('#tornado').innerHTML = rows.map(x => { const L = Math.min(x.lo, x.hi), H = Math.max(x.lo, x.hi);
+    return `<div class="tr"><span>${x.l}</span><div class="bar"><i style="left:${50 + L / mx * 48}%;width:${(H - L) / mx * 48}%"></i></div><b>${L.toFixed(1)}% ~ +${H.toFixed(1)}%</b></div>`; }).join('');
+}
+
+/* 判斷題 */
+let qi = 0, qScore = 0, qDone = {};
+function renderQuiz() { const q = QUIZ[qi], done = qDone[qi];
+  $('#quiz').innerHTML = `<p class="qn">第 ${qi + 1} / ${QUIZ.length} 題　答對 ${qScore}</p><h3>${q.q}</h3>` +
+    q.o.map((o, j) => `<button class="opt ${done != null ? (j === q.a ? 'right' : (j === done ? 'wrong' : '')) : ''}" data-o="${j}" ${done != null ? 'disabled' : ''}>${o}</button>`).join('') +
+    (done != null ? `<p class="hint"><b>${done === q.a ? '正確' : '再想一次'}</b>${q.e}<cite>依據：${q.s}</cite></p>` : '') +
+    `<div class="nav"><button class="btn ghost" id="qp" ${qi ? '' : 'disabled'}>上一題</button><button class="btn" id="qn" ${qi < QUIZ.length - 1 ? '' : 'disabled'}>下一題</button></div>`;
+  $$('#quiz .opt').forEach(b => b.onclick = () => { const j = +b.dataset.o; qDone[qi] = j; if (j === q.a) qScore++; logRow('quiz_answers', { q_index: qi + 1, chosen: j, correct: j === q.a }); renderQuiz(); });
+  $('#qp').onclick = () => { qi--; renderQuiz(); }; $('#qn').onclick = () => { qi++; renderQuiz(); };
+}
+
+/* 審查者模式 */
+function startReview(k) { reviewMode = true; loadCase(k); $('#rv-list').innerHTML = REVIEW_ITEMS.map(([id, t]) => `<label class="tick"><input type="checkbox" id="rv_${id}" value="${id}">${t}</label>`).join(''); $('#rv-out').innerHTML = ''; $('#rv-box').hidden = false; go('calc'); }
+function gradeReview() { const { checks } = check(state), bad = new Set(checks.filter(c => c.level !== 'ok').map(c => c.id));
+  let hit = 0, miss = 0, fa = 0; const lines = REVIEW_ITEMS.map(([id, t]) => { const p = $('#rv_' + id).checked, b = bad.has(id);
+    if (p && b) hit++; else if (!p && b) miss++; else if (p && !b) fa++;
+    return (p || b) ? `<li class="${p && b ? 'ok' : (b ? 'warn' : 'note')}">${p && b ? '抓到' : (b ? '漏審' : '誤判')}：${t}</li>` : ''; }).join('');
+  $('#rv-out').innerHTML = `<p><b>抓到 ${hit}　漏審 ${miss}　誤判 ${fa}</b></p><ul class="plain">${lines}</ul><p class="hint">回到「試算」分頁可看各項依據與分級提示。誤判與漏審同樣扣分：審查意見寫錯，申請人會要求你提出依據。</p>`;
+  logRow('review_results', { case_key: state.name, hit, miss, false_alarm: fa, picked: REVIEW_ITEMS.filter(([id]) => $('#rv_' + id).checked).map(([id]) => id) }); reviewMode = false; render(); }
+
+/* AI 助教 */
+function buildPrompt(mode) { const { r, checks } = check(state), R = RULES[state.city];
+  const data = `案件：${state.name}（適用${R.name}規則）\n土地 ${state.landM2}㎡，移入 ${state.inM2}㎡，允建容積率 ${state.farBef}% → ${state.farAft}%\n` +
+    ['aft', 'bef'].map(k => { const s = state[k]; return `${k === 'aft' ? '容移後' : '容移前'}：地上${s.floorsUp}F/地下${s.floorsDown}F，開挖率${s.digRate}%，建蔽率${s.bcr}%，住宅${s.resArea}坪@${s.resPrice}，車位${s.parkN}個@${s.parkPrice}，總登記${s.regArea}坪，營造${s.cost}元/坪，年期${s.years}年，利潤率${s.R}%，綜合利率${s.i}%`; }).join('\n') +
+    `\n結果：容移後基地單價 ${r.a.unit}、容移前 ${r.b.unit} 元/坪，代金 ${Math.round(r.fee)} 元，代金市價比 ${r.mktRatio.toFixed(4)}\n檢核未通過項目：${checks.filter(c => c.level !== 'ok').map(c => c.title).join('；') || '無'}`;
+  const ask = { grill: '你是容積代金審議委員。請依上列資料對估價師（我）提出 5 個最尖銳的質詢，一次問一題，等我回答後再評論並追問。不要直接告訴我答案。',
+    explain: '請逐項解釋上列未通過的檢核項目背後的估價邏輯，說明為何雙情境比較需要這項一致性，並各舉一個反例。請標示你引用的規定出處與版本年度，不確定者請明講。',
+    memo: '請以審查委員口吻，就上列資料草擬 5 點審查意見，每點含「問題、依據、請補正事項」。請標示規定出處與版本年度，不確定者請明講。' }[mode];
+  return `${data}\n\n${ask}\n\n限制：臺北市與新北市規定不同且逐年修訂，請勿把一市的規定套到另一市。`; }
+let sampler = null, lastAiMode = 'grill';
+async function runAI(mode) { lastAiMode = mode; const p = buildPrompt(mode), out = $('#ai-out'); $('#ai-prompt').value = p;
+  if (!sampler) { out.textContent = '請按「複製提示詞」，貼到你慣用的 AI 工具，再把回答貼回下方存入使用紀錄。'; return; }
+  out.textContent = '思考中…';
+  try { const res = await sampler(p, { onText: ({ text }) => out.textContent = text }); out.textContent = res.text; }
+  catch (e) { out.textContent = '呼叫失敗（' + (e.code || '未知') + '）。請改用「複製提示詞」。'; } }
+
+function go(t) { $$('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.t === t)); $$('main > section').forEach(s => s.hidden = s.id !== t); try { location.hash = t; } catch (e) {} }
+
+function init() {
+  buildForm();
+  $('#sens-ctl').innerHTML = SENS.map(([k, l, u, st]) => `<label for="s_${k}">${l}<output id="sv_${k}">0</output><input type="range" id="s_${k}" min="${u === '%' ? -20 : -3}" max="${u === '%' ? 20 : 3}" step="${u === '%' ? 1 : 0.25}" value="0"></label>`).join('');
+  $$('#sens-ctl input').forEach(el => el.addEventListener('input', render));
+  $('#sens-reset').onclick = () => { $$('#sens-ctl input').forEach(e => e.value = 0); render(); };
+  $$('.tab').forEach(b => b.onclick = () => go(b.dataset.t));
+  $('#load-base').onclick = () => { reviewMode = false; $('#rv-box').hidden = true; loadCase('base'); };
+  $$('[data-review]').forEach(b => b.onclick = () => startReview(b.dataset.review));
+  $('#rv-grade').onclick = gradeReview;
+  $$('[data-ai]').forEach(b => b.onclick = () => runAI(b.dataset.ai));
+  $('#ai-copy').onclick = async () => { const t = $('#ai-prompt'); if (!t.value) t.value = buildPrompt('grill'); try { await navigator.clipboard.writeText(t.value); $('#ai-copy').textContent = '已複製'; } catch (e) { t.select(); $('#ai-copy').textContent = '請長按全選複製'; } };
+  fillForm(); render(); renderQuiz();
+  const h = (location.hash || '').slice(1); if (['calc', 'sens', 'quiz', 'review', 'ai', 'rules'].includes(h)) go(h);
+  $('#rules-body').innerHTML = `<tr><th>銷坪比取位</th><td>2 位（營建樓地板逾 20,000㎡ 取 3 位）</td><td>3 位</td></tr><tr><th>審議期間</th><td>${RULES.tpe.reviewNote}</td><td>${RULES.ntpc.reviewNote}</td></tr><tr><th>利潤率</th><td>依開發年期對照表：未滿1.5年 12~13%，每0.5年一級，4.5~5年 19~20%；${RULES.tpe.profitOver5}</td><td>未附對照表，依第四號公報說明</td></tr><tr><th>容移前地下室</th><td>減層則開挖率不變；縮開挖率以不超過容移後之 10% 為原則</td><td>【待查證】本工具所讀新北資料未載明，先比照臺北原則提示</td></tr><tr><th>比較案例屋齡</th><td>3 年內新成屋</td><td>5 年內新成屋</td></tr><tr><th>價格日期</th><td>${RULES.tpe.priceDate}</td><td>${RULES.ntpc.priceDate}</td></tr><tr><th>小規模加價</th><td>依第四號公報</td><td>容移後總登記面積小於 2,500 坪，前後一同加價（建議 10% 以上）</td></tr><tr><th>代金比例</th><td>移入容積 50% 以上須繳納代金</td><td>可自由選擇</td></tr>`;
+  if (window.claude && claude.use) claude.use('sample').then(s => { if (s) { sampler = s; $('#ai-note').textContent = '已連線 AI，可直接在此頁對話。'; } });
+}
+document.addEventListener('DOMContentLoaded', init);
+/* 雲端紀錄（Supabase）。SB.url 與 SB.key 留空時自動停用，網站仍可離線使用。key 為公開的 anon key，權限由資料庫 RLS 控制。 */
+const SB = { url: '', key: '' };
+const who = { sid: '', grp: '' };
+try { Object.assign(who, JSON.parse(localStorage.getItem('tdr_who') || '{}')); } catch (e) {}
+const cloudOn = () => SB.url && SB.key && /^[0-9A-Za-z]{6,12}$/.test(who.sid);
+async function sb(path, body) {
+  const r = await fetch(SB.url + '/rest/v1/' + path, { method: 'POST', headers: { apikey: SB.key, Authorization: 'Bearer ' + SB.key, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(r.status + ' ' + (await r.text()).slice(0, 120));
+  return r.status === 204 || r.headers.get('content-length') === '0' ? null : r.json().catch(() => null);
+}
+function logRow(table, row) { if (!cloudOn()) return; sb(table, Object.assign({ student_id: who.sid, group_code: who.grp || null }, row)).catch(e => setMsg('紀錄未送出：' + e.message)); }
+function setMsg(t) { const el = document.querySelector('#who-msg'); if (el) el.textContent = t; }
+function initCloud() {
+  const sid = document.querySelector('#who-sid'), grp = document.querySelector('#who-grp');
+  sid.value = who.sid || ''; grp.value = who.grp || '';
+  const upd = () => { who.sid = sid.value.trim(); who.grp = grp.value.trim(); try { localStorage.setItem('tdr_who', JSON.stringify(who)); } catch (e) {}
+    setMsg(!SB.url ? '此版本未連線資料庫，作答不會上傳。' : (cloudOn() ? '已連線，作答與審查結果會自動記錄。' : '請輸入學號（6 至 12 碼英數字）後開始記錄。')); };
+  sid.addEventListener('input', upd); grp.addEventListener('input', upd); upd();
+  document.querySelector('#case-save').onclick = async () => { const pin = document.querySelector('#case-pin').value.trim(), out = document.querySelector('#case-msg');
+    if (!cloudOn() || !who.grp || pin.length < 4) { out.textContent = '需要學號、組別與至少 4 碼的組密碼。'; return; }
+    try { await sb('rpc/save_case', { p_group: who.grp, p_pin: pin, p_student: who.sid, p_data: state }); out.textContent = '已儲存本組參數。'; } catch (e) { out.textContent = '儲存失敗：' + e.message; } };
+  document.querySelector('#case-load').onclick = async () => { const pin = document.querySelector('#case-pin').value.trim(), out = document.querySelector('#case-msg');
+    if (!SB.url || !who.grp || !pin) { out.textContent = '需要組別與組密碼。'; return; }
+    try { const d = await sb('rpc/load_case', { p_group: who.grp, p_pin: pin }); if (!d) { out.textContent = '查無資料或組密碼不符。'; return; }
+      state = d; hintLv = {}; save(); fillForm(); render(); out.textContent = '已載入本組參數。'; } catch (e) { out.textContent = '載入失敗：' + e.message; } };
+  document.querySelector('#ai-save').onclick = () => { const out = document.querySelector('#ai-save-msg'), ans = document.querySelector('#ai-ans').value.trim(), fix = document.querySelector('#ai-fix').value.trim();
+    if (!cloudOn()) { out.textContent = '需要先輸入學號，且此版本須已連線資料庫。'; return; }
+    if (!ans) { out.textContent = '請貼上 AI 的回答。'; return; }
+    sb('ai_logs', { student_id: who.sid, group_code: who.grp || null, mode: lastAiMode, prompt: document.querySelector('#ai-prompt').value, ai_answer: ans, correction: fix || null })
+      .then(() => out.textContent = '已存入 AI 使用紀錄。').catch(e => out.textContent = '儲存失敗：' + e.message); };
+}
+document.addEventListener('DOMContentLoaded', initCloud);
+</script></body></html>
