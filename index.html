@@ -422,7 +422,7 @@ function init() {
 }
 document.addEventListener('DOMContentLoaded', init);
 /* 雲端紀錄（Supabase）。SB.url 與 SB.key 留空時自動停用，網站仍可離線使用。key 為公開的 anon key，權限由資料庫 RLS 控制。 */
-const SB = { url: '', key: '' };
+const SB = { url: 'https://abivagstlpxduhokslee.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiaXZhZ3N0bHB4ZHVob2tzbGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyNjc3MTQsImV4cCI6MjEwOTg0MzcxNH0.KRWPTgUVWTDSbm0LIYVKp2C0q8uPnYq5h2I3q2jj66w' };
 const who = { sid: '', grp: '' };
 try { Object.assign(who, JSON.parse(localStorage.getItem('tdr_who') || '{}')); } catch (e) {}
 const cloudOn = () => SB.url && SB.key && /^[0-9A-Za-z]{6,12}$/.test(who.sid);
