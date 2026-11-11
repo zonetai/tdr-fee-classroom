@@ -70,7 +70,7 @@ p{margin:0}
 <body>
 <header>
 <h1>容積代金檢核教室</h1>
-<p>政大地政「都市更新與容積代金估價實務」115-1　雙情境土地開發分析法</p>
+<p>政大地政「都市更新與容積代金估價實務」115-1　雙情境土地開發分析法＋比較法雙軌</p>
 <nav role="tablist">
 <button class="tab" role="tab" data-t="calc" aria-selected="true">試算與檢核</button>
 <button class="tab" role="tab" data-t="sens" aria-selected="false">敏感度</button>
@@ -83,17 +83,24 @@ p{margin:0}
 <main>
 <div class="card" id="who"><div class="grid"><label for="who-sid">學號<input id="who-sid" type="text" autocomplete="off" maxlength="12"></label><label for="who-grp">組別<input id="who-grp" type="text" autocomplete="off" maxlength="20"></label></div><p id="who-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
 <section id="calc">
-<div class="kpis" id="kpi"></div>
+<div class="card" id="start"><h2>① 開案：選你的案件</h2>
+<div class="grid"><label for="case-pick">案件<select id="case-pick"><option value="">（我的參數）</option><option value="nb">範例｜北安段（雙軌完整範例）</option><option value="g1">G1 新北汐止</option><option value="g2">G2 臺北大安</option><option value="g3">G3 臺北萬華（古蹟）</option><option value="g4">G4 新北永和</option><option value="g5">G5 新北中和（增額）</option><option value="g6">G6 新北中和（TOD）</option><option value="g7">G7 臺中南屯</option><option value="base">舊示範｜江翠段（114 期末考）</option></select></label></div>
+<h4>② 從 Excel 匯入</h4><p style="font-size:12px;color:var(--mut)">在計算範本「B 第二引擎」分頁複製交換碼（ZT1| 開頭的那一格），貼到這裡。</p>
+<textarea id="xcode" aria-label="Excel 交換碼" style="min-height:60px" placeholder="ZT1|city=tpe|land=…"></textarea>
+<div class="btns" style="margin-top:8px"><button class="btn" id="xcode-go">匯入並檢核</button><button class="btn ghost" id="share">複製本案連結</button></div><p id="start-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p>
+<p class="hint"><b>③ 看燈號</b>匯入後往下看「檢核結果」。警訊不代表錯，代表報告要寫理由；每一項都可以按「給我提示」。</p></div>
+
+<p class="hint" id="todo" hidden></p><div class="kpis" id="kpi"></div>
 <div class="card"><h2>檢核結果　<span id="sum"></span></h2><ul id="checks"></ul>
 <div id="rv-box" hidden><p class="hint"><b>你是協檢委員</b>下面哪些是本案應提出的審查意見？看完參數再勾選。</p><div id="rv-list"></div><div class="btns"><button class="btn" id="rv-grade">送出審查意見</button></div><div id="rv-out"></div></div></div>
 <div class="card"><h2 id="casename"></h2>
-<div class="grid"><label for="city">適用規則<select id="city"><option value="tpe">臺北市</option><option value="ntpc">新北市</option></select></label></div>
+<div class="grid"><label for="city">適用規則<select id="city"><option value="tpe">臺北市</option><option value="ntpc">新北市</option><option value="tch">臺中市</option></select></label></div>
 <p id="ruleset" style="font-size:11px;color:var(--mut);margin:4px 0 10px"></p>
 <div class="grid" id="f-common"></div><div id="f-scen"></div>
 <div class="btns" style="margin-top:10px"><button class="btn ghost" id="load-base">還原示範案</button></div>
 <h4>本組參數存取</h4><div class="grid"><label for="case-pin">組密碼（4 碼以上，第一次儲存時設定）<input id="case-pin" type="password" autocomplete="off"></label></div><div class="btns" style="margin-top:8px"><button class="btn" id="case-save">儲存本組參數</button><button class="btn ghost" id="case-load">載入本組參數</button></div><p id="case-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
 <div class="card"><h2>計算過程</h2><p style="font-size:12px;color:var(--mut)">V＝S÷(1＋R)÷(1＋i)−(C＋M)；單價取位至千位；總價＝單價×土地坪數</p>
-<div class="scroll"><table><thead><tr><th></th><th>總銷 S</th><th>直接成本 C</th><th>間接成本 M</th><th>土地總價 V</th><th>單價(元/坪)</th><th>決定總價</th></tr></thead><tbody id="steps"></tbody></table></div></div>
+<div class="scroll"><table><thead><tr><th></th><th>總銷 S</th><th>直接成本 C</th><th>間接成本 M</th><th>土地總價 V</th><th>土開單價</th><th>決定單價</th></tr></thead><tbody id="steps"></tbody></table></div></div>
 </section>
 <section id="sens" hidden>
 <div class="card"><h2>拉動參數，看代金怎麼變</h2><p style="font-size:13px;color:var(--mut);margin-bottom:10px">調整同時套用於容移前、後兩個情境。</p><div id="sens-ctl"></div><div class="btns" style="margin:12px 0"><button class="btn ghost" id="sens-reset">歸零</button></div><div id="sens-out"></div></div>
@@ -120,7 +127,7 @@ p{margin:0}
 const PING = 0.3025;
 const RULES = {
   tpe: {
-    name: '臺北市', ver: '114年範本（114.10.30 教育訓練版）',
+    name: '臺北市', ver: '容積代金估價報告書範本 114 年修正版（114.06.12）＋113.12.13 分段估價原則',
     ratioDecimals: (bulkM2) => bulkM2 > 20000 ? 3 : 2,
     profit: [[0,1.5,12,13],[1.5,2,13,14],[2,2.5,14,15],[2.5,3,15,16],[3,3.5,16,17],[3.5,4,17,18],[4,4.5,18,19],[4.5,5,19,20]],
     profitOver5: '開發年期5年以上，每增加0.5年加計1%~2%',
@@ -130,38 +137,42 @@ const RULES = {
     src: { profit: '臺北市範本 土地開發分析法-利潤率表', dig: '臺北市審議原則自主檢核表「容移前地下室車位數量設置原則」', years: '107年共識會議結論', ratio: '臺北市範本 內文型式', result: '審議原則自主檢核表「評估結果」' }
   },
   ntpc: {
-    name: '新北市', ver: '113年作業注意事項與審議重點（113.9.24）',
+    name: '新北市', ver: '容積移轉代金估價作業注意事項 115 年 4 月版',
     ratioDecimals: () => 3,
     profit: null, profitOver5: '',
     reviewInYears: true,
     reviewNote: '有都更、都審、開放空間、工業區立體化審查者，依表於土地開發年期或建物工期加計審查期間',
-    digCut: null, caseAgeYears: 5, priceDate: '申請估價收件日',
+    digCut: 10, caseAgeYears: 5, priceDate: '申請估價收件日',
     smallScalePing: 2500,
-    src: { years: '新北市113年注意事項 土開法重要原則(3)', ratio: '新北市113年注意事項 土開法重要原則(1)', small: '新北市113年注意事項 土開法重要原則(5)', fund: '新北市113年注意事項 土開法重要原則(2)' }
+    src: { years: '新北市115年4月版注意事項 土開法重要原則(3)', ratio: '新北市115年4月版注意事項 土開法重要原則(1)', small: '新北市115年4月版注意事項 土開法重要原則(5)', fund: '新北市115年4月版注意事項 土開法重要原則(2)' }
   },
+  tch: { name: '臺中市', ver: '臺中市容積代金相關規定【版本待查證】；本工具僅作雙情境一致性檢核', ratioDecimals: () => 2, profit: null, profitOver5: '', reviewInYears: false,
+    reviewNote: '臺中市審議期間處理方式【待查證】', digCut: null, caseAgeYears: 5, priceDate: '依委託', src: { years: '臺中市規定【待查證】', ratio: '臺中市規定【待查證】' } },
   indirect: { design: [2,3], adv: [3,7], mgmt: [4,5], tax: [0.5,1.2], src: '示範計算檔備註（依第四號公報）【費率區間請回查公報原文】' },
   green: { 鑽石級: [3500,4500], 黃金級: [2000,3000], '銀級/銅級/合格級': [500,1800] },
   smart: { '鑽石級/黃金級': [3.5,4.2], 銀級: [1.5,1.9], 銅級: [0.6,0.8] }
 };
 
-function scen(s, landPing) {
+function scen(s, landPing, wLand) {
   const S = s.resArea * s.resPrice + (s.shopArea||0) * (s.shopPrice||0) + s.parkN * s.parkPrice;
   const direct = s.cost * s.regArea;
   const M = direct * s.design/100 + S * (s.adv + s.mgmt + s.tax)/100;
   const V = Math.round(S / (1 + s.R/100) / (1 + s.i/100) - (direct + M));
   const unit = Math.round(V / landPing / 1000) * 1000;
-  return { S, direct, M, V, unit, total: unit * landPing, sellArea: s.resArea + (s.shopArea||0) };
+  const w = (wLand == null ? 100 : wLand) / 100;
+  const fin = (w < 1 && s.cmp > 0) ? Math.round((unit * w + s.cmp * (1 - w)) / 1000) * 1000 : unit;
+  return { S, direct, M, V, unit, fin, total: fin * landPing, sellArea: s.resArea + (s.shopArea||0) };
 }
 
 function calc(c) {
   const landPing = c.landM2 * PING, inPing = c.inM2 * PING;
-  const a = scen(c.aft, landPing), b = scen(c.bef, landPing);
-  const fee = a.total - b.total;
+  const a = scen(c.aft, landPing, c.wLand), b = scen(c.bef, landPing, c.wLand);
+  const fee = Math.trunc((a.fin - b.fin) * landPing), feeLand = Math.trunc((a.unit - b.unit) * landPing);
   const feePerPing = fee / inPing;
-  const volUnitAft = a.unit / (c.farAft/100);
+  const volUnitAft = a.fin / (c.farAft/100);
   const avgRes = c.aft.resPrice;
   return {
-    landPing, inPing, a, b, fee, feePerPing,
+    landPing, inPing, a, b, fee, feeLand, feePerPing,
     mktRatio: feePerPing / volUnitAft, priceRatio: feePerPing / avgRes,
     ratioA: a.sellArea / (landPing * c.farAft/100), ratioB: b.sellArea / (landPing * c.farBef/100),
     dS: a.S - b.S, dC: (a.direct + a.M) - (b.direct + b.M), dDirect: a.direct - b.direct
@@ -200,7 +211,7 @@ function check(c) {
   // 4 地下室
   const cutFloors = A.floorsDown - B.floorsDown, cut = A.digRate ? (A.digRate - B.digRate) / A.digRate * 100 : 0;
   let lv = 'ok', h2 = '';
-  if (cutFloors > 0 && Math.abs(A.digRate - B.digRate) > 0.001) { lv = 'warn'; h2 = '已減少地下樓層，原則上應維持與容移後相同之開挖率。'; }
+  if (cutFloors > 0 && Math.abs(A.digRate - B.digRate) > 0.1) { lv = 'warn'; h2 = '已減少地下樓層，原則上應維持與容移後相同之開挖率。'; }
   else if (cutFloors === 0 && R.digCut && cut > R.digCut) { lv = 'warn'; h2 = `開挖率縮減 ${fmt(cut,1)}%，超過容移後開挖率之 ${R.digCut}%（例：70% 不宜低於 63%），超過時以刪減一層為原則。`; }
   else if (cutFloors < 0 || cut < 0) { lv = 'warn'; h2 = '容移前地下室規模大於容移後，方向相反。'; }
   else h2 = cutFloors > 0 ? '減層且開挖率一致，符合原則。' : `開挖率縮減 ${fmt(cut,1)}%。`;
@@ -239,7 +250,7 @@ function check(c) {
     '樓層較低的建物，單位造價通常如何？', '營造單價之區間決定方式應一致；容移前樓層較低，造價級距不應高於容移後。', '例外：縮減後樓層落入次一級距時，得參酌該級距臨界值推估。', '臺北市範本「土地開發分析法-造價成本」');
 
   // 10 售價與成本
-  const dp = A.resPrice - B.resPrice, dc = A.cost - B.cost;
+  const dp = Math.round(A.resPrice - B.resPrice), dc = Math.round(A.cost - B.cost);
   add('price', dp < 0 ? 'warn' : (dc > 0 && dp > dc * 1.5 ? 'note' : 'ok'), `住宅均價差 ${dp.toLocaleString()}／造價差 ${dc.toLocaleString()} 元/坪`,
     '均價為什麼不同？是樓層效用，還是把造價轉嫁給售價？', '比準戶單價原則上不因總樓層數差異而調整；均價差應來自新增高樓層之樓層別效用。成本增加不等於價值增加。',
     '把容移後新增樓層的效用比加權算一次，看均價差是否對得上。', '114期末考第8題；示範檔「比準戶原則不依總樓層數差異調整」');
@@ -270,6 +281,32 @@ const CASES = {
   }
 };
 const clone = o => JSON.parse(JSON.stringify(o));
+/* 115-1 課程案件：nb＝雙軌範例（完整參數），g1～g7＝各組起始量體（價格與成本由各組自行推估） */
+CASES.nb = { name: '範例：臺北市中山區北安段（審議會版，114.04.25）', city: 'tpe', landM2: 3442.56, inM2: 3098.29, farLegal: 225, farBef: 359.98, farAft: 449.98, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 29, floorsDown: 4, digRate: 69.31, bcr: 50, regArea: 9343.465901, resArea: 7535.23, resPrice: 1563104.931104, shopArea: 191.44, shopPrice: 1952236.470957, parkN: 229, parkPrice: 3499956.331878, cost: 376000, design: 3, adv: 4.5, mgmt: 4.5, tax: 1, years: 5.48, R: 21, i: 9.59, cmp: 4692000},
+  bef: {floorsUp: 24, floorsDown: 3, digRate: 69.307434, bcr: 50, regArea: 7357.312712, resArea: 5984.49, resPrice: 1510987.597941, shopArea: 194.34, shopPrice: 1952234.022847, parkN: 163, parkPrice: 3600613.496933, cost: 355000, design: 3, adv: 4.5, mgmt: 4.5, tax: 1, years: 4.78, R: 20, i: 8.48, cmp: 3917000} };
+CASES.g1 = { name: "G1 新北市汐止區 住宅大基地案（價格日期 110 年）", city: 'ntpc', landM2: 47846.75, inM2: 40191.27, farLegal: 210, farBef: 315, farAft: 399, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 22, floorsDown: 3, digRate: 0, bcr: 50, regArea: 0, resArea: 86624.75, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 2392, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 18, floorsDown: 2, digRate: 0, bcr: 50, regArea: 0, resArea: 68387.96, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 1650, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g2 = { name: "G2 臺北市大安區 SRC 住宅案（容移後／容移前；TOD 回饋獎勵前請另以 Excel 計算）", city: 'tpe', landM2: 3157, inM2: 3314.85, farLegal: 300, farBef: 495, farAft: 599.91, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 22, floorsDown: 5, digRate: 73.93, bcr: 50, regArea: 0, resArea: 8596.85, resPrice: 0, shopArea: 246.78, shopPrice: 0, parkN: 249, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 18, floorsDown: 4, digRate: 73.93, bcr: 50, regArea: 0, resArea: 7043.5, resPrice: 0, shopArea: 253.84, shopPrice: 0, parkN: 200, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g3 = { name: "G3 臺北市萬華區 古蹟容移案（虛擬比準地，容積率 225% → 315%）", city: 'tpe', landM2: 2677.5, inM2: 2409.75, farLegal: 225, farBef: 225, farAft: 315, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 14, floorsDown: 3, digRate: 0, bcr: 50, regArea: 0, resArea: 3937.81, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 135, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 10, floorsDown: 2, digRate: 70, bcr: 50, regArea: 0, resArea: 2763.0, resPrice: 0, shopArea: 128.38, shopPrice: 0, parkN: 95, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g4 = { name: "G4 新北市永和區 超高層住宅案", city: 'ntpc', landM2: 4257.54, inM2: 2203.27, farLegal: 345, farBef: 690, farAft: 741.75, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 36, floorsDown: 6, digRate: 61.17, bcr: 50, regArea: 18186.3, resArea: 14588.88, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 362, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 34, floorsDown: 6, digRate: 59.03, bcr: 50, regArea: 17154.46, resArea: 13572.78, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 327, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g5 = { name: "G5 新北市中和區 增額容積案", city: 'ntpc', landM2: 2715.28, inM2: 2851.044, farLegal: 300, farBef: 495, farAft: 600, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 24, floorsDown: 6, digRate: 61.83, bcr: 50, regArea: 10117.3, resArea: 7934.04, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 235, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 20, floorsDown: 5, digRate: 61.83, bcr: 50, regArea: 8441.47, resArea: 6546.66, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 184, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g6 = { name: "G6 新北市中和區 中型 TOD 增額案", city: 'ntpc', landM2: 3830.64, inM2: 1608.87, farLegal: 210, farBef: 315, farAft: 357, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 10, floorsDown: 0, digRate: 0, bcr: 50, regArea: 0, resArea: 6610.62, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 110, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 8, floorsDown: 0, digRate: 0, bcr: 50, regArea: 0, resArea: 5832.9, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 98, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g7 = { name: "G7 臺中市南屯區 住宅大基地案（224% 方案 vs 168% 容積測試方案）", city: 'tch', landM2: 6124.71, inM2: 3429.84, farLegal: 168, farBef: 168, farAft: 224, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 23, floorsDown: 2, digRate: 70, bcr: 50, regArea: 0, resArea: 6652.89, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 181, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 18, floorsDown: 2, digRate: 60, bcr: 50, regArea: 0, resArea: 5007.96, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 0, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+
 CASES.flaw1 = (() => { const c = clone(CASES.base); c.name = '待審案 A（臺北市，模擬）'; c.city = 'tpe';
   c.bef.floorsDown = 4; c.bef.digRate = 52; c.bef.R = 17; c.bef.adv = 5; c.bef.resPrice = 620000; c.legalPark = 40; return c; })();
 CASES.flaw2 = (() => { const c = clone(CASES.base); c.name = '待審案 B（臺北市，模擬）'; c.city = 'tpe';
@@ -288,24 +325,25 @@ const QUIZ = [
   { q: '業主的容移後方案是 B4、開挖率 70%。你建構容移前情境時決定「不減層、只縮開挖率」。下列何者符合臺北市原則？', o: ['開挖率 55%', '開挖率 60%', '開挖率 64%', '開挖率不得調整'], a: 2, e: '縮減幅度以不超過容移後開挖率之 10% 為原則，70% 不宜低於 63%；超過時以刪減一層為原則。', s: '臺北市審議原則自主檢核表' },
   { q: '同上案，若你改採「刪減一層地下室」，開挖率應如何處理？', o: ['同步縮減 10%', '維持與容移後相同', '提高以補足車位', '由估價師自由決定'], a: 1, e: '優先減少樓層數時，以維持與容移後相同之開挖率為原則。', s: '臺北市審議原則自主檢核表' },
   { q: '臺北市案件屬都市更新案，都更審議預估 18 個月。計算土地開發年期時應如何處理？', o: ['全數計入', '計入一半', '容移前後均不計入', '只計入容移後'], a: 2, e: '容移前、後均不計都市更新年期，也不計容積代金審議期程。', s: '107年共識會議結論' },
-  { q: '同樣是都更案，但基地在新北市。審議期間的處理與臺北市相比如何？', o: ['相同，均不計入', '相反，新北市依表加計審查期間', '新北市只計代金審議', '兩市均由估價師自行決定'], a: 1, e: '新北市注意事項要求有都更、都審、開放空間、工業區立體化審查者，依表於土地開發年期或建物工期加計。跨縣市執業最容易在此出錯。', s: '新北市113年注意事項 土開法重要原則(3)' },
+  { q: '同樣是都更案，但基地在新北市。審議期間的處理與臺北市相比如何？', o: ['相同，均不計入', '相反，新北市依表加計審查期間', '新北市只計代金審議', '兩市均由估價師自行決定'], a: 1, e: '新北市注意事項要求有都更、都審、開放空間、工業區立體化審查者，依表於土地開發年期或建物工期加計。跨縣市執業最容易在此出錯。', s: '新北市115年4月版注意事項 土開法重要原則(3)' },
   { q: '容移後 24 層、容移前 19 層，容移後營造單價較高。學生主張「造價高所以容移後每坪售價也應同步調高」。你的審查意見是？', o: ['同意，成本決定價格', '不同意，售價差應來自樓層別效用等效用因素，成本不等於價值', '同意，但只能調高 5%', '不同意，售價應完全相同'], a: 1, e: '比準戶單價原則上不因總樓層數差異調整；均價差應由新增高樓層之效用（視野、景觀）支撐。', s: '114上期末考第8題' },
   { q: '比較法中，比較標的容積率與勘估標的不同。容積率調整率應如何求得？', o: ['按容積率比例直線調整', '以土地開發分析法試算兩容積率下之地價求得', '參考公告現值比', '一律調整 10%'], a: 1, e: '調整率＝勘估標的容積率土開試算價格÷比較標的容積率土開試算價格−1，並於附件詳列計算過程。', s: '臺北市範本 調整率注意事項' },
   { q: '勘估標的容積率 420%。比較標的容積率差異分別為 86.7%、40%、20%。調整修正係數（調整率÷容積率差異）應呈現何種關係？', o: ['差異越大係數越大', '差異越大係數越小', '三者相同', '無一定關係'], a: 1, e: '使用強度達邊際效益遞減時，容積率越高、容積單價越低，容積率差異越大則修正係數越小。', s: '臺北市範本 調整率注意須知' },
   { q: '臺北市範本中，開發年期 4.2 年的建議投資利潤率區間為何？', o: ['16%~17%', '17%~18%', '18%~19%', '19%~20%'], a: 2, e: '4.0 以上未滿 4.5 年對應 18%~19%。5 年以上每增加 0.5 年加計 1%~2%。', s: '臺北市範本 利潤率表' },
   { q: '比較法選取建物成交案例時，臺北市與新北市對屋齡的原則分別是？', o: ['均為 3 年內', '臺北 3 年內、新北 5 年內', '臺北 5 年內、新北 3 年內', '均無限制'], a: 1, e: '臺北市以三年內新成屋為原則；新北市以五年內新成屋為原則，無適當案例得放寬並敘明理由。', s: '兩市範本及注意事項' },
   { q: '本案申請黃金級綠建築與銀級智慧建築。依範本，造價應如何加計？', o: ['綠建築 2,000~3,000 元/坪；智慧建築為總工程造價 1.5%~1.9%', '兩者合計加 5%', '綠建築 3,500~4,500 元/坪；智慧建築 3.5%~4.2%', '不得加計'], a: 0, e: '綠建築以每坪金額加計，智慧建築以總工程造價比例加計，兩者計價基礎不同。', s: '114上期末考第5題；範本造價成本表' },
-  { q: '新北市案件，容移後含車位總登記面積 2,100 坪。造價應如何處理？', o: ['不需處理', '只在容移前加價', '依四號公報第16條於容移前後一同加價並敘明', '只在容移後加價'], a: 2, e: '未達營建經濟規模（經驗值 2,500 坪）者，容移前後一同加價，建議 10% 以上。只加一邊會破壞一致性。', s: '新北市113年注意事項 土開法重要原則(5)' },
+  { q: '新北市案件，容移後含車位總登記面積 2,100 坪。造價應如何處理？', o: ['不需處理', '只在容移前加價', '依四號公報第16條於容移前後一同加價並敘明', '只在容移後加價'], a: 2, e: '未達營建經濟規模（經驗值 2,500 坪）者，容移前後一同加價，建議 10% 以上。只加一邊會破壞一致性。', s: '新北市115年4月版注意事項 土開法重要原則(5)' },
   { q: '審查時發現：容移後總銷增加 3.8 億元，總造價增加 4.1 億元。這代表什麼？', o: ['代金偏高', '移入容積不具經濟價值，售價或造價設定有誤', '正常現象', '應改用比較法'], a: 1, e: '檢核式要求總銷增額大於總造價增額，不成立時應回頭檢視售價與造價參數。', s: '審議原則自主檢核表「評估結果」' },
   { q: '業主只提供容移後方案。估價師建構容移前情境時，減少的容積應從哪裡扣？', o: ['各樓層平均縮小', '由頂層依次遞減', '由低樓層扣除', '縮小基地面積'], a: 1, e: '實設建蔽率相同、減少容積由頂層依次遞減，目的是讓各估價師有一致的評估基礎，並非市場性規劃。', s: '臺北市範本 開發量體及產品規劃' }
 ];
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const nf = (x, d = 0) => Number(x).toLocaleString('zh-TW', { maximumFractionDigits: d, minimumFractionDigits: d });
-const F_COMMON = [['landM2', '土地面積', '㎡'], ['inM2', '移入樓地板面積', '㎡'], ['farLegal', '法定容積率', '%'], ['farBef', '容移前允建容積率', '%'], ['farAft', '容移後允建容積率', '%'], ['legalPark', '容移前法定車位數（0＝不檢核）', '個']];
+const F_COMMON = [['landM2', '土地面積', '㎡'], ['inM2', '移入樓地板面積', '㎡'], ['farLegal', '法定容積率', '%'], ['farBef', '容移前允建容積率', '%'], ['farAft', '容移後允建容積率', '%'], ['legalPark', '容移前法定車位數（0＝不檢核）', '個'], ['wLand', '土開法權重（100＝只用土開法）', '%']];
 const F_SCEN = [
   ['量體', [['floorsUp', '地上樓層', '層'], ['floorsDown', '地下樓層', '層'], ['digRate', '開挖率', '%'], ['bcr', '實設建蔽率', '%'], ['regArea', '總登記面積（含車位）', '坪']]],
   ['銷售', [['resArea', '住宅銷售面積', '坪'], ['resPrice', '住宅平均單價', '元/坪'], ['shopArea', '店面銷售面積', '坪'], ['shopPrice', '店面平均單價', '元/坪'], ['parkN', '銷售車位數', '個'], ['parkPrice', '車位平均單價', '元/個']]],
-  ['成本與報酬', [['cost', '營造施工費', '元/坪'], ['design', '規劃設計費（占營造費）', '%'], ['adv', '廣告銷售費（占總銷）', '%'], ['mgmt', '管理費（占總銷）', '%'], ['tax', '稅捐（占總銷）', '%'], ['years', '土地開發年期', '年'], ['R', '利潤率', '%'], ['i', '資本利息綜合利率', '%']]]
+  ['成本與報酬', [['cost', '營造施工費', '元/坪'], ['design', '規劃設計費（占營造費）', '%'], ['adv', '廣告銷售費（占總銷）', '%'], ['mgmt', '管理費（占總銷）', '%'], ['tax', '稅捐（占總銷）', '%'], ['years', '土地開發年期', '年'], ['R', '利潤率', '%'], ['i', '資本利息綜合利率', '%']]],
+  ['比較法（雙軌第二方法）', [['cmp', '土地比較法單價', '元/坪']]]
 ];
 let state = clone(CASES.base), reviewMode = false, hintLv = {};
 try { const s = localStorage.getItem('tdr_state'); if (s) state = JSON.parse(s); } catch (e) {}
@@ -323,23 +361,27 @@ function buildForm() {
   $('#city').addEventListener('change', e => { state.city = e.target.value; save(); render(); });
 }
 function fillForm() {
-  F_COMMON.forEach(([k]) => $('#c_' + k).value = state[k]);
-  F_SCEN.forEach(([, fs]) => fs.forEach(([k]) => { $('#a_' + k).value = state.aft[k]; $('#b_' + k).value = state.bef[k]; }));
-  $('#city').value = state.city; $('#casename').textContent = state.name;
+  F_COMMON.forEach(([k]) => $('#c_' + k).value = state[k] ?? '');
+  F_SCEN.forEach(([, fs]) => fs.forEach(([k]) => { $('#a_' + k).value = state.aft[k] ?? ''; $('#b_' + k).value = state.bef[k] ?? ''; }));
+  $('#city').value = state.city; $('#casename').textContent = state.name; $('#case-pick').value = state.key || '';
 }
-function loadCase(k) { state = clone(CASES[k]); hintLv = {}; save(); fillForm(); render(); }
+function loadCase(k) { state = clone(CASES[k]); state.key = k; hintLv = {}; save(); fillForm(); render(); }
 
 function render() {
-  const { r, checks } = check(state), R = RULES[state.city];
+  const R = RULES[state.city];
+  const ready = ['aft', 'bef'].every(k => state[k].resPrice > 0 && state[k].cost > 0 && state[k].regArea > 0 && state[k].years > 0);
+  $('#todo').hidden = ready;
+  if (!ready) { $('#todo').innerHTML = '<b>還差價格與成本</b>本案只預載量體。請在下方填入住宅、店面、車位單價、營造單價、總登記面積、費率、年期、R 與 i；或到「① 開案」貼上 Excel 交換碼。填齊後才會亮燈。'; $('#ruleset').textContent = `${R.name}｜${R.ver}`; $('#kpi').innerHTML = ''; $('#checks').innerHTML = ''; $('#sum').innerHTML = ''; $('#steps').innerHTML = ''; return; }
+  const { r, checks } = check(state);
   $('#ruleset').textContent = `${R.name}｜${R.ver}`;
   $('#kpi').innerHTML = [
-    ['容積代金', nf(r.fee) + ' 元', '容移後總價 − 容移前總價'],
-    ['基地單價', `${nf(r.a.unit)}<small> ← ${nf(r.b.unit)}</small>`, '元/坪，容移後 ← 容移前'],
+    ['容積代金', nf(r.fee) + ' 元', (state.wLand < 100 ? `決定單價差×土地坪數；只用土開法 ${nf(r.feeLand)} 元（差 ${((r.fee / r.feeLand - 1) * 100).toFixed(2)}%）` : '土開法單價差×土地坪數')],
+    ['決定單價', `${nf(r.a.fin)}<small> ← ${nf(r.b.fin)}</small>`, `元/坪，容移後 ← 容移前；土開 ${nf(r.a.unit)} ← ${nf(r.b.unit)}`],
     ['代金市價比', r.mktRatio.toFixed(4), '代金容積單價 ÷ 容移後容積單價'],
     ['代金房價比', r.priceRatio.toFixed(4), '代金容積單價 ÷ 住宅均價']
   ].map(([t, v, s], i) => `<div class="kpi${i ? '' : ' main'}"><span>${t}</span><b>${v}</b><em>${s}</em></div>`).join('');
   $('#steps').innerHTML = ['a', 'b'].map(k => { const x = r[k], s = k === 'a' ? state.aft : state.bef;
-    return `<tr><th>${k === 'a' ? '容移後' : '容移前'}</th><td>${nf(x.S)}</td><td>${nf(x.direct)}</td><td>${nf(x.M)}</td><td>${nf(x.V)}</td><td>${nf(x.unit)}</td><td>${nf(x.total)}</td></tr>`; }).join('');
+    return `<tr><th>${k === 'a' ? '容移後' : '容移前'}</th><td>${nf(x.S)}</td><td>${nf(x.direct)}</td><td>${nf(x.M)}</td><td>${nf(x.V)}</td><td>${nf(x.unit)}</td><td>${nf(x.fin)}</td></tr>`; }).join('');
   const cnt = { warn: 0, note: 0, ok: 0 }; checks.forEach(c => cnt[c.level]++);
   $('#sum').innerHTML = reviewMode ? '審查者模式：燈號已關閉，請自行判斷後到「審查」分頁作答。' :
     `<span class="pill warn">警訊 ${cnt.warn}</span><span class="pill note">請說明 ${cnt.note}</span><span class="pill ok">符合 ${cnt.ok}</span>`;
@@ -416,11 +458,34 @@ function init() {
   $$('[data-ai]').forEach(b => b.onclick = () => runAI(b.dataset.ai));
   $('#ai-copy').onclick = async () => { const t = $('#ai-prompt'); if (!t.value) t.value = buildPrompt('grill'); try { await navigator.clipboard.writeText(t.value); $('#ai-copy').textContent = '已複製'; } catch (e) { t.select(); $('#ai-copy').textContent = '請長按全選複製'; } };
   fillForm(); render(); renderQuiz();
-  const h = (location.hash || '').slice(1); if (['calc', 'sens', 'quiz', 'review', 'ai', 'rules'].includes(h)) go(h);
+  const h = (location.hash || '').slice(1).split('&')[0]; if (['calc', 'sens', 'quiz', 'review', 'ai', 'rules'].includes(h)) go(h);
   $('#rules-body').innerHTML = `<tr><th>銷坪比取位</th><td>2 位（營建樓地板逾 20,000㎡ 取 3 位）</td><td>3 位</td></tr><tr><th>審議期間</th><td>${RULES.tpe.reviewNote}</td><td>${RULES.ntpc.reviewNote}</td></tr><tr><th>利潤率</th><td>依開發年期對照表：未滿1.5年 12~13%，每0.5年一級，4.5~5年 19~20%；${RULES.tpe.profitOver5}</td><td>未附對照表，依第四號公報說明</td></tr><tr><th>容移前地下室</th><td>減層則開挖率不變；縮開挖率以不超過容移後之 10% 為原則</td><td>【待查證】本工具所讀新北資料未載明，先比照臺北原則提示</td></tr><tr><th>比較案例屋齡</th><td>3 年內新成屋</td><td>5 年內新成屋</td></tr><tr><th>價格日期</th><td>${RULES.tpe.priceDate}</td><td>${RULES.ntpc.priceDate}</td></tr><tr><th>小規模加價</th><td>依第四號公報</td><td>容移後總登記面積小於 2,500 坪，前後一同加價（建議 10% 以上）</td></tr><tr><th>代金比例</th><td>移入容積 50% 以上須繳納代金</td><td>可自由選擇</td></tr>`;
   if (window.claude && claude.use) claude.use('sample').then(s => { if (s) { sampler = s; $('#ai-note').textContent = '已連線 AI，可直接在此頁對話。'; } });
 }
 document.addEventListener('DOMContentLoaded', init);
+/* Excel 交換碼：ZT1|city=..|land=..|in=..|far=後/前|w=..|A=樓上面積,樓上均價,地面面積,地面均價,車位數,車位均價,營造,總登記,設計%,廣銷%,管理%,稅捐%,R%,i%,年期,地上,地下,開挖%[,比較法]|B=… */
+function parseCode(t) {
+  t = (t || '').trim().replace(/^"|"$/g, ''); if (!t.startsWith('ZT1|')) throw new Error('交換碼要以 ZT1| 開頭');
+  const kv = {}; t.split('|').slice(1).forEach(p => { const i = p.indexOf('='); if (i > 0) kv[p.slice(0, i)] = p.slice(i + 1); });
+  const keys = ['resArea', 'resPrice', 'shopArea', 'shopPrice', 'parkN', 'parkPrice', 'cost', 'regArea', 'design', 'adv', 'mgmt', 'tax', 'R', 'i', 'years', 'floorsUp', 'floorsDown', 'digRate', 'cmp'];
+  const sc = v => { const n = (v || '').split(',').map(Number); if (n.length < 18 || n.slice(0, 18).some(isNaN)) throw new Error('情境欄位不足或不是數字'); const o = { bcr: 50 }; keys.forEach((k, j) => o[k] = n[j] || 0); return o; };
+  const [fa, fb] = (kv.far || '0/0').split('/').map(Number);
+  return { name: 'Excel 匯入案件', key: '', city: RULES[kv.city] ? kv.city : 'tpe', landM2: +kv.land, inM2: +kv.in, farLegal: 0, farBef: fb, farAft: fa, legalPark: 0, wLand: kv.w ? +kv.w : 100, aft: sc(kv.A), bef: sc(kv.B) };
+}
+function caseFromUrl() {
+  const q = new URLSearchParams(location.search), h = (location.hash || '').slice(1);
+  let k = q.get('case') || (q.get('g') ? 'g' + q.get('g') : '') || (/^g[1-7]$|^nb$/.test(h) ? h : '');
+  return CASES[k] ? k : null;
+}
+function initStart() {
+  $('#case-pick').onchange = e => { const k = e.target.value; if (!k) return; reviewMode = false; $('#rv-box').hidden = true; loadCase(k); history.replaceState(null, '', '?case=' + k); $('#start-msg').textContent = '已載入：' + CASES[k].name; };
+  $('#xcode-go').onclick = () => { try { state = parseCode($('#xcode').value); hintLv = {}; save(); fillForm(); render(); $('#start-msg').textContent = '匯入成功。代金與 Excel 若不同，先看「土開法權重」與比較法單價是否一致。'; }
+    catch (e) { $('#start-msg').textContent = '匯入失敗：' + e.message; } };
+  $('#share').onclick = async () => { const u = location.origin + location.pathname + (state.key ? '?case=' + state.key : ''); try { await navigator.clipboard.writeText(u); $('#start-msg').textContent = '已複製：' + u; } catch (e) { $('#start-msg').textContent = u; } };
+  const k = caseFromUrl(); if (k) loadCase(k);
+}
+document.addEventListener('DOMContentLoaded', initStart);
+
 /* 雲端紀錄（Supabase）。SB.url 與 SB.key 留空時自動停用，網站仍可離線使用。key 為公開的 anon key，權限由資料庫 RLS 控制。 */
 const SB = { url: 'https://abivagstlpxduhokslee.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiaXZhZ3N0bHB4ZHVob2tzbGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyNjc3MTQsImV4cCI6MjEwOTg0MzcxNH0.KRWPTgUVWTDSbm0LIYVKp2C0q8uPnYq5h2I3q2jj66w' };
 const who = { sid: '', grp: '' };
