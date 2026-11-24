@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>容積代金檢核教室</title>
+<title>容積代金檢核教室｜網路學堂</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
 <style>
 /* 版面：單欄工作台，頂部分頁，手機優先；結果先於明細 */
@@ -13,10 +13,10 @@
 :root[data-theme="dark"]{--ink:#e6ecec;--mut:#9fb0b4;--bg:#101a1d;--card:#182428;--line:#2c3c41;--teal:#7fb4c2;--brick:#e08a7d;--camel:#c9c1a8;--ok:#6fc49b;--note:#e0b458;--warn:#ef8377;--tint:#1f3035;color-scheme:dark}
 *{box-sizing:border-box}html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);font-variant-numeric:tabular-nums}
-header{background:var(--teal);color:var(--bg);padding:14px 16px 0}
+header{background:var(--teal);color:var(--bg);padding:14px 16px 6px}
 header h1{font:700 20px/1.3 var(--disp);margin:0;text-wrap:balance}
-header p{margin:2px 0 10px;font-size:12px;opacity:.85}
-nav{display:flex;gap:2px;overflow-x:auto}
+header p{margin:2px 0 4px;font-size:12px;opacity:.85}
+nav{display:flex;gap:2px;overflow-x:auto;position:sticky;top:0;z-index:5;background:var(--teal);color:var(--bg);padding:4px 10px 0;scrollbar-width:none}nav::-webkit-scrollbar{display:none}
 .tab{flex:none;border:0;background:transparent;color:inherit;font:500 14px var(--body);padding:9px 12px;border-radius:8px 8px 0 0;opacity:.75;cursor:pointer}
 .tab[aria-selected="true"]{background:var(--bg);color:var(--ink);opacity:1}
 main{max-width:860px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
@@ -65,48 +65,112 @@ cite{display:block;font-style:normal;font-size:11px;color:var(--mut);margin-top:
 textarea{min-height:140px;font-size:12px}#ai-ans,#ai-fix{font-size:14px}
 footer{max-width:860px;margin:0 auto;padding:0 16px 28px;font-size:11px;color:var(--mut)}
 p{margin:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.chipbtn{flex:none;border:1px solid currentColor;background:transparent;color:inherit;font:500 12px var(--body);padding:5px 10px;border-radius:99px;cursor:pointer;opacity:.9;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.step{display:flex;flex-direction:column;gap:4px;text-align:left;border:1px solid var(--line);border-top:5px solid var(--teal);background:var(--card);color:var(--ink);font:15px var(--body);padding:12px;border-radius:10px;cursor:pointer;min-height:112px}
+.step b{font-size:19px}.step span{font-size:13px;color:var(--mut)}.step em{font-style:normal;font-size:12px;color:var(--teal);font-weight:700;margin-top:auto}
+.step:nth-child(2){border-top-color:var(--brick)}.step:nth-child(3){border-top-color:var(--camel)}
+.pbar{height:8px;background:var(--tint);border-radius:99px;overflow:hidden;margin:6px 0 10px}.pbar i{display:block;height:100%;background:var(--ok);border-radius:99px}
+.tasks li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}.tasks li:last-child{border-bottom:0}
+.tasks .box{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--card)}
+.tasks li.done .box{background:var(--ok);border-color:var(--ok)}.tasks li.done span{color:var(--mut)}
+.tasks button{margin-left:auto;flex:none}
+.mini{border:1px solid var(--teal);background:transparent;color:var(--teal);font:500 13px var(--body);padding:5px 10px;border-radius:8px;cursor:pointer}
+details.lesson,details.fold{background:var(--card);border:1px solid var(--line);border-radius:10px}
+details.lesson>summary,details.fold>summary{list-style:none;cursor:pointer;padding:13px 14px;display:flex;gap:10px;align-items:center;font-weight:700;font-size:16px}
+details.lesson>summary::-webkit-details-marker,details.fold>summary::-webkit-details-marker{display:none}
+details.lesson>summary:after,details.fold>summary:after{content:"＋";margin-left:auto;color:var(--mut);font-weight:400}
+details[open].lesson>summary:after,details[open].fold>summary:after{content:"－"}
+.lesson .no{flex:none;width:28px;height:28px;border-radius:50%;background:var(--teal);color:var(--bg);display:grid;place-items:center;font-size:14px}
+.lesson.read .no{background:var(--ok)}
+.lesson .in,.fold .in{padding:0 14px 14px}
+.lesson .pts{list-style:disc;padding-left:20px;display:block}.lesson .pts li{margin:0 0 8px;font-size:15px}
+.lesson .ref{font-size:12px;color:var(--mut);margin:6px 0 10px}
+.try{background:var(--tint);border-radius:8px;padding:12px;margin:10px 0}.try h4{margin:0 0 8px}.try output{display:block;margin-top:8px;font-weight:700;font-size:15px}
+.qdots{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.qd{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font:500 13px var(--body);cursor:pointer}
+.qd.r{background:var(--ok);border-color:var(--ok);color:var(--card)}.qd.w{background:var(--warn);border-color:var(--warn);color:var(--card)}.qd.cur{outline:2px solid var(--brick);outline-offset:2px}
+.opt{min-height:48px}
+.sub{font-size:13px;color:var(--mut)}
+.banner{background:var(--tint);border-left:5px solid var(--note);border-radius:8px;padding:10px 12px;font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.adv{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.adv button{text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);font:15px var(--body);padding:12px;border-radius:10px;cursor:pointer}.adv b{display:block}.adv span{font-size:13px;color:var(--mut)}
+@media (max-width:560px){body{font-size:16px}.steps3{grid-template-columns:1fr}.step{min-height:0;flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:10px}.step em{margin:0 0 0 auto}.pair{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr)}main{padding:12px}}
 </style>
 </head>
 <body>
 <header>
-<h1>容積代金檢核教室</h1>
-<p>政大地政「都市更新與容積代金估價實務」115-1　雙情境土地開發分析法＋比較法雙軌</p>
-<nav role="tablist">
-<button class="tab" role="tab" data-t="calc" aria-selected="true">試算與檢核</button>
-<button class="tab" role="tab" data-t="sens" aria-selected="false">敏感度</button>
-<button class="tab" role="tab" data-t="quiz" aria-selected="false">判斷題</button>
-<button class="tab" role="tab" data-t="review" aria-selected="false">審查</button>
-<button class="tab" role="tab" data-t="ai" aria-selected="false">AI 助教</button>
-<button class="tab" role="tab" data-t="rules" aria-selected="false">兩市規則</button>
-</nav>
+<div class="top"><h1>容積代金檢核教室</h1><button class="chipbtn" id="who-chip" type="button"></button></div>
+<p>政大地政「都市更新與容積代金估價實務」115-1　網路學堂 · 測驗 · 試算檢核</p>
 </header>
+<nav role="tablist">
+<button class="tab" role="tab" data-t="home" aria-selected="true">首頁</button>
+<button class="tab" role="tab" data-t="learn" aria-selected="false">學堂</button>
+<button class="tab" role="tab" data-t="quiz" aria-selected="false">測驗</button>
+<button class="tab" role="tab" data-t="calc" aria-selected="false">試算檢核</button>
+<button class="tab" role="tab" data-t="sens" aria-selected="false">敏感度</button>
+<button class="tab" role="tab" data-t="review" aria-selected="false">審查演練</button>
+<button class="tab" role="tab" data-t="ai" aria-selected="false">AI 助教</button>
+</nav>
 <main>
-<div class="card" id="who"><div class="grid"><label for="who-sid">學號<input id="who-sid" type="text" autocomplete="off" maxlength="12"></label><label for="who-grp">組別<input id="who-grp" type="text" autocomplete="off" maxlength="20"></label></div><p id="who-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
-<section id="calc">
-<div class="card" id="start"><h2>① 開案：選你的案件</h2>
-<div class="grid"><label for="case-pick">案件<select id="case-pick"><option value="">（我的參數）</option><option value="nb">範例｜北安段（雙軌完整範例）</option><option value="g1">G1 新北汐止</option><option value="g2">G2 臺北大安</option><option value="g3">G3 臺北萬華（古蹟）</option><option value="g4">G4 新北永和</option><option value="g5">G5 新北中和（增額）</option><option value="g6">G6 新北中和（TOD）</option><option value="g7">G7 臺中南屯</option><option value="base">舊示範｜江翠段（114 期末考）</option></select></label></div>
-<h4>② 從 Excel 匯入</h4><p style="font-size:12px;color:var(--mut)">在計算範本「B 第二引擎」分頁複製交換碼（ZT1| 開頭的那一格），貼到這裡。</p>
+<section id="home">
+<div class="card"><h2>第一次來？照 1、2、3 走</h2>
+<div class="steps3">
+<button class="step" type="button" data-go="learn"><b>1 學</b><span>八堂短課，每堂約 3 分鐘</span><em id="pg-learn"></em></button>
+<button class="step" type="button" data-go="quiz"><b>2 測</b><span>14 題判斷題，答完馬上看解析</span><em id="pg-quiz"></em></button>
+<button class="step" type="button" data-go="calc"><b>3 算</b><span>載入本組案件，看檢核燈號</span><em id="pg-case"></em></button>
+</div></div>
+<div class="card" id="who"><h2>先填學號與組別</h2><p class="sub" style="margin-bottom:8px">填了才會記錄測驗與審查演練的結果。資料存在這台裝置，下次打開不必重填。</p>
+<div class="grid"><label for="who-sid">學號<input id="who-sid" type="text" inputmode="text" autocomplete="off" maxlength="12" placeholder="例：112207001"></label><label for="who-grp">組別<select id="who-grp"><option value="">還沒分組</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select></label></div><p id="who-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
+<div class="card"><h2>建議進度</h2><div class="pbar"><i id="task-bar" style="width:0"></i></div><ul class="tasks" id="tasks"></ul></div>
+<div class="card"><h2>學會之後再玩</h2><div class="adv">
+<button type="button" data-go="sens"><b>敏感度</b><span>售價漲 5%，代金漲多少？拉拉看</span></button>
+<button type="button" data-go="review"><b>審查演練</b><span>你當協檢委員，找出待審案的問題</span></button>
+<button type="button" data-go="ai"><b>AI 助教</b><span>讓 AI 扮委員質詢你，並留下使用紀錄</span></button>
+</div></div>
+<details class="fold"><summary>常見問題</summary><div class="in">
+<p><b>不填學號可以用嗎？</b><br>可以，所有功能照常，只是不會留下紀錄。</p>
+<p style="margin-top:8px"><b>換手機或換瀏覽器，進度還在嗎？</b><br>已讀與作答進度只存在原本那台裝置。換裝置要重新作答，老師端的紀錄不受影響。</p>
+<p style="margin-top:8px"><b>Excel 交換碼在哪裡？</b><br>計算範本「B 第二引擎」分頁，ZT1| 開頭的那一格。複製後到「試算檢核」貼上。</p>
+<p style="margin-top:8px"><b>亮警訊就是算錯嗎？</b><br>不一定。警訊代表報告書要寫理由。每一項都可以按「給我提示」。</p>
+</div></details>
+</section>
+
+<section id="learn" hidden>
+<div class="card"><h2>網路學堂</h2><p class="sub">對應簡報二。每堂看完按「我看懂了」，再做該堂的題目。</p><div class="pbar"><i id="learn-bar" style="width:0"></i></div><p class="sub" id="learn-sum"></p></div>
+<div id="lessons" style="display:flex;flex-direction:column;gap:10px"></div>
+</section>
+
+<section id="quiz" hidden><div class="card" id="quiz-card"></div></section>
+
+<section id="calc" hidden>
+<div class="card" id="start"><h2>① 選案件</h2>
+<div class="btns" style="margin-bottom:10px"><button class="btn" id="pick-nb" type="button">載入範例：北安段</button><button class="btn ghost" id="pick-mine" type="button" hidden></button></div>
+<div class="grid"><label for="case-pick">或從清單選<select id="case-pick"><option value="">（我的參數）</option><option value="nb">範例｜北安段（雙軌完整範例）</option><option value="g1">G1 新北汐止</option><option value="g2">G2 臺北大安</option><option value="g3">G3 臺北萬華（古蹟）</option><option value="g4">G4 新北永和</option><option value="g5">G5 新北中和（增額）</option><option value="g6">G6 新北中和（TOD）</option><option value="g7">G7 臺中南屯</option><option value="base">舊示範｜江翠段（114 期末考）</option></select></label></div>
+<p id="start-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p>
+<details class="fold" style="margin-top:10px"><summary style="font-size:14px;padding:10px 12px">② 已經有 Excel 計算檔？貼交換碼匯入</summary><div class="in">
+<p style="font-size:12px;color:var(--mut)">在計算範本「B 第二引擎」分頁複製交換碼（ZT1| 開頭的那一格），貼到這裡。</p>
 <textarea id="xcode" aria-label="Excel 交換碼" style="min-height:60px" placeholder="ZT1|city=tpe|land=…"></textarea>
-<div class="btns" style="margin-top:8px"><button class="btn" id="xcode-go">匯入並檢核</button><button class="btn ghost" id="share">複製本案連結</button></div><p id="start-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p>
-<p class="hint"><b>③ 看燈號</b>匯入後往下看「檢核結果」。警訊不代表錯，代表報告要寫理由；每一項都可以按「給我提示」。</p></div>
+<div class="btns" style="margin-top:8px"><button class="btn" id="xcode-go" type="button">匯入並檢核</button><button class="btn ghost" id="share" type="button">複製本案連結</button></div></div></details>
+<p class="hint"><b>③ 看燈號</b>往下看「檢核結果」。警訊不代表錯，代表報告要寫理由；每一項都可以按「給我提示」。</p></div>
 
 <p class="hint" id="todo" hidden></p><div class="kpis" id="kpi"></div>
 <div class="card"><h2>檢核結果　<span id="sum"></span></h2><ul id="checks"></ul>
 <div id="rv-box" hidden><p class="hint"><b>你是協檢委員</b>下面哪些是本案應提出的審查意見？看完參數再勾選。</p><div id="rv-list"></div><div class="btns"><button class="btn" id="rv-grade">送出審查意見</button></div><div id="rv-out"></div></div></div>
-<div class="card"><h2 id="casename"></h2>
+<details class="fold" open><summary id="casename"></summary><div class="in">
 <div class="grid"><label for="city">適用規則<select id="city"><option value="tpe">臺北市</option><option value="ntpc">新北市</option><option value="tch">臺中市</option></select></label></div>
 <p id="ruleset" style="font-size:11px;color:var(--mut);margin:4px 0 10px"></p>
 <div class="grid" id="f-common"></div><div id="f-scen"></div>
-<div class="btns" style="margin-top:10px"><button class="btn ghost" id="load-base">還原示範案</button></div>
-<h4>本組參數存取</h4><div class="grid"><label for="case-pin">組密碼（4 碼以上，第一次儲存時設定）<input id="case-pin" type="password" autocomplete="off"></label></div><div class="btns" style="margin-top:8px"><button class="btn" id="case-save">儲存本組參數</button><button class="btn ghost" id="case-load">載入本組參數</button></div><p id="case-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
-<div class="card"><h2>計算過程</h2><p style="font-size:12px;color:var(--mut)">V＝S÷(1＋R)÷(1＋i)−(C＋M)；單價取位至千位；總價＝單價×土地坪數</p>
-<div class="scroll"><table><thead><tr><th></th><th>總銷 S</th><th>直接成本 C</th><th>間接成本 M</th><th>土地總價 V</th><th>土開單價</th><th>決定單價</th></tr></thead><tbody id="steps"></tbody></table></div></div>
+<div class="btns" style="margin-top:10px"><button class="btn ghost" id="load-base" type="button">還原範例（北安段）</button></div></div></details>
+<details class="fold"><summary>本組參數存取（跨裝置、組員共用）</summary><div class="in"><div class="grid"><label for="case-pin">組密碼（4 碼以上，第一次儲存時設定）<input id="case-pin" type="password" autocomplete="off"></label></div><div class="btns" style="margin-top:8px"><button class="btn" id="case-save" type="button">儲存本組參數</button><button class="btn ghost" id="case-load" type="button">載入本組參數</button></div><p id="case-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div></details>
+<details class="fold"><summary>計算過程</summary><div class="in"><p style="font-size:12px;color:var(--mut)">V＝S÷(1＋R)÷(1＋i)−(C＋M)；單價取位至千位；總價＝單價×土地坪數</p>
+<div class="scroll"><table><thead><tr><th></th><th>總銷 S</th><th>直接成本 C</th><th>間接成本 M</th><th>土地總價 V</th><th>土開單價</th><th>決定單價</th></tr></thead><tbody id="steps"></tbody></table></div></div></details>
 </section>
 <section id="sens" hidden>
 <div class="card"><h2>拉動參數，看代金怎麼變</h2><p style="font-size:13px;color:var(--mut);margin-bottom:10px">調整同時套用於容移前、後兩個情境。</p><div id="sens-ctl"></div><div class="btns" style="margin:12px 0"><button class="btn ghost" id="sens-reset">歸零</button></div><div id="sens-out"></div></div>
 <div class="card"><h2>哪個參數最敏感</h2><div id="tornado"></div><p class="hint"><b>想一想</b>售價變動 5% 對代金的影響，為什麼遠大於 5%？這就是剩餘法的槓桿：土地價格是總銷扣掉成本與利潤後的殘值，代金又是兩個殘值的差。</p></div>
 </section>
-<section id="quiz" hidden><div class="card" id="quiz"></div></section>
 <section id="review" hidden>
 <div class="card"><h2>角色翻轉：你來當協檢委員</h2><p>載入一份有瑕疵的代金參數表。燈號會關閉，請自行判讀後勾選應提出的審查意見。漏審與誤判都會被記錄。</p><div class="btns" style="margin-top:12px"><button class="btn" data-review="flaw1">審查待審案 A</button><button class="btn" data-review="flaw2">審查待審案 B</button></div></div>
 <div class="card"><h2>審查同學的案子</h2><p>請對方把參數輸入「試算與檢核」分頁，你先不看燈號，口頭提出三點意見，再對照檢核結果。審查意見的品質列入平時成績。</p></div>
@@ -119,7 +183,6 @@ p{margin:0}
 <h4>AI 使用紀錄</h4><label for="ai-ans">AI 的回答（貼上）<textarea id="ai-ans"></textarea></label><label for="ai-fix" style="margin-top:8px">我查證後的修正（AI 哪裡說錯、依據是什麼）<textarea id="ai-fix" style="min-height:80px"></textarea></label><div class="btns" style="margin-top:8px"><button class="btn" id="ai-save">存入使用紀錄</button></div><p id="ai-save-msg" style="font-size:12px;color:var(--mut);margin:6px 0"></p>
 <p class="hint"><b>使用規則</b>AI 的回答可能引用舊版或別的縣市的規定。報告須附「AI 使用紀錄」：問了什麼、AI 答了什麼、你查證後修正了什麼。抓到 AI 的錯誤可加分。</p></div>
 </section>
-<section id="rules" hidden><div class="card" id="rules"><h2>臺北市與新北市規則對照</h2><div class="scroll"><table><thead><tr><th>項目</th><th>臺北市</th><th>新北市</th></tr></thead><tbody id="rules-body"></tbody></table></div></div></section>
 </main>
 <footer>教學用工具，檢核門檻依課程講義整理，非審議依據。實際案件以主管機關現行範本及審議決議為準。</footer>
 <script>
@@ -345,7 +408,7 @@ const F_SCEN = [
   ['成本與報酬', [['cost', '營造施工費', '元/坪'], ['design', '規劃設計費（占營造費）', '%'], ['adv', '廣告銷售費（占總銷）', '%'], ['mgmt', '管理費（占總銷）', '%'], ['tax', '稅捐（占總銷）', '%'], ['years', '土地開發年期', '年'], ['R', '利潤率', '%'], ['i', '資本利息綜合利率', '%']]],
   ['比較法（雙軌第二方法）', [['cmp', '土地比較法單價', '元/坪']]]
 ];
-let state = clone(CASES.base), reviewMode = false, hintLv = {};
+let state = Object.assign(clone(CASES.nb), { key: 'nb' }), reviewMode = false, hintLv = {};
 try { const s = localStorage.getItem('tdr_state'); if (s) state = JSON.parse(s); } catch (e) {}
 const save = () => { try { localStorage.setItem('tdr_state', JSON.stringify(state)); } catch (e) {} };
 
@@ -354,7 +417,7 @@ function buildForm() {
   $('#f-scen').innerHTML = F_SCEN.map(([g, fs]) => `<h4>${g}</h4><div class="pair head"><span></span><b>容移後</b><b>容移前</b></div>` +
     fs.map(([k, l, u]) => `<div class="pair"><span>${l}<i class="u">${u}</i></span><input id="a_${k}" data-s="aft" data-k="${k}" type="number" inputmode="decimal" step="any" aria-label="容移後${l}"><input id="b_${k}" data-s="bef" data-k="${k}" type="number" inputmode="decimal" step="any" aria-label="容移前${l}"></div>`).join('')).join('');
   $$('#calc input').forEach(el => el.addEventListener('input', () => {
-    const v = parseFloat(el.value); if (isNaN(v)) return;
+    if (!el.dataset.k) return; const v = parseFloat(el.value); if (isNaN(v)) return;
     if (el.dataset.s) state[el.dataset.s][el.dataset.k] = v; else state[el.dataset.k] = v;
     save(); render();
   }));
@@ -365,13 +428,13 @@ function fillForm() {
   F_SCEN.forEach(([, fs]) => fs.forEach(([k]) => { $('#a_' + k).value = state.aft[k] ?? ''; $('#b_' + k).value = state.bef[k] ?? ''; }));
   $('#city').value = state.city; $('#casename').textContent = state.name; $('#case-pick').value = state.key || '';
 }
-function loadCase(k) { state = clone(CASES[k]); state.key = k; hintLv = {}; save(); fillForm(); render(); }
+function loadCase(k) { state = clone(CASES[k]); state.key = k; hintLv = {}; save(); fillForm(); render(); if (window.renderHome) renderHome(); }
 
 function render() {
   const R = RULES[state.city];
   const ready = ['aft', 'bef'].every(k => state[k].resPrice > 0 && state[k].cost > 0 && state[k].regArea > 0 && state[k].years > 0);
   $('#todo').hidden = ready;
-  if (!ready) { $('#todo').innerHTML = '<b>還差價格與成本</b>本案只預載量體。請在下方填入住宅、店面、車位單價、營造單價、總登記面積、費率、年期、R 與 i；或到「① 開案」貼上 Excel 交換碼。填齊後才會亮燈。'; $('#ruleset').textContent = `${R.name}｜${R.ver}`; $('#kpi').innerHTML = ''; $('#checks').innerHTML = ''; $('#sum').innerHTML = ''; $('#steps').innerHTML = ''; return; }
+  if (!ready) { $('#todo').innerHTML = '<b>還差價格與成本</b>本案只預載量體。請在下方填入住宅、店面、車位單價、營造單價、總登記面積、費率、年期、R 與 i；或到「① 開案」貼上 Excel 交換碼。填齊後才會亮燈。'; $('#ruleset').textContent = `${R.name}｜${R.ver}`; $('#kpi').innerHTML = ''; $('#checks').innerHTML = ''; $('#sum').innerHTML = ''; $('#steps').innerHTML = ''; $('#sens-out').innerHTML = '<em>這個案件還沒填價格與成本。先到「試算檢核」載入範例北安段，就能拉動參數。</em>'; $('#tornado').innerHTML = ''; return; }
   const { r, checks } = check(state);
   $('#ruleset').textContent = `${R.name}｜${R.ver}`;
   $('#kpi').innerHTML = [
@@ -408,15 +471,94 @@ function renderSens(r) {
     return `<div class="tr"><span>${x.l}</span><div class="bar"><i style="left:${50 + L / mx * 48}%;width:${(H - L) / mx * 48}%"></i></div><b>${L.toFixed(1)}% ~ +${H.toFixed(1)}%</b></div>`; }).join('');
 }
 
-/* 判斷題 */
-let qi = 0, qScore = 0, qDone = {};
-function renderQuiz() { const q = QUIZ[qi], done = qDone[qi];
-  $('#quiz').innerHTML = `<p class="qn">第 ${qi + 1} / ${QUIZ.length} 題　答對 ${qScore}</p><h3>${q.q}</h3>` +
-    q.o.map((o, j) => `<button class="opt ${done != null ? (j === q.a ? 'right' : (j === done ? 'wrong' : '')) : ''}" data-o="${j}" ${done != null ? 'disabled' : ''}>${o}</button>`).join('') +
-    (done != null ? `<p class="hint"><b>${done === q.a ? '正確' : '再想一次'}</b>${q.e}<cite>依據：${q.s}</cite></p>` : '') +
-    `<div class="nav"><button class="btn ghost" id="qp" ${qi ? '' : 'disabled'}>上一題</button><button class="btn" id="qn" ${qi < QUIZ.length - 1 ? '' : 'disabled'}>下一題</button></div>`;
-  $$('#quiz .opt').forEach(b => b.onclick = () => { const j = +b.dataset.o; qDone[qi] = j; if (j === q.a) qScore++; logRow('quiz_answers', { q_index: qi + 1, chosen: j, correct: j === q.a }); renderQuiz(); });
-  $('#qp').onclick = () => { qi--; renderQuiz(); }; $('#qn').onclick = () => { qi++; renderQuiz(); };
+/* 測驗：作答存在本機，可重做錯題；每答一題照舊寫入 quiz_answers */
+let qAns = {}; try { qAns = JSON.parse(localStorage.getItem('tdr_quiz') || '{}'); } catch (e) {}
+const Q_ALL = QUIZ.map((_, i) => i);
+let qSet = Q_ALL, qPos = 0, qLabel = '全部 14 題';
+const qSave = () => { try { localStorage.setItem('tdr_quiz', JSON.stringify(qAns)); } catch (e) {} };
+const qStat = (set = Q_ALL) => { let d = 0, c = 0; set.forEach(i => { if (qAns[i] != null) { d++; if (qAns[i] === QUIZ[i].a) c++; } }); return { d, c, n: set.length }; };
+function startQuiz(set, label) { qSet = set; qLabel = label; qPos = Math.max(0, set.findIndex(i => qAns[i] == null)); renderQuiz(); }
+function renderQuiz() {
+  const el = $('#quiz-card'), st = qStat(qSet), all = qStat();
+  const head = `<h2>測驗　<span class="sub">${qLabel}</span></h2><p class="sub">這一輪已答 ${st.d} / ${st.n}，答對 ${st.c}。全部 14 題累計答對 ${all.c}。</p><div class="pbar"><i style="width:${st.n ? st.d / st.n * 100 : 0}%"></i></div>`;
+  const tools = `<div class="btns" style="margin-top:14px"><button class="mini" data-qs="all">全部 14 題</button><button class="mini" data-qs="todo">只做未答</button><button class="mini" data-qs="wrong">重做錯題</button><button class="mini" data-qs="reset">全部清除重來</button></div>`;
+  if (!qSet.length) { el.innerHTML = head + `<p class="hint"><b>這一輪沒有題目</b>沒有未答或答錯的題目了。</p>` + tools; bindQuizTools(); return; }
+  const i = qSet[qPos], q = QUIZ[i], done = qAns[i];
+  const dots = `<div class="qdots">` + qSet.map((k, p) => `<button class="qd ${qAns[k] == null ? '' : (qAns[k] === QUIZ[k].a ? 'r' : 'w')} ${p === qPos ? 'cur' : ''}" data-p="${p}" aria-label="第 ${p + 1} 題">${p + 1}</button>`).join('') + `</div>`;
+  const fin = st.d === st.n ? `<p class="hint"><b>這一輪完成</b>答對 ${st.c} / ${st.n}。${st.c < st.n ? '按「重做錯題」再試一次，或回學堂看對應的課。' : '全對，可以到「試算檢核」載入本組案件了。'}</p>` : '';
+  el.innerHTML = head + dots + `<p class="qn">第 ${qPos + 1} / ${qSet.length} 題</p><h3>${q.q}</h3>` +
+    q.o.map((o, j) => `<button class="opt ${done != null ? (j === q.a ? 'right' : (j === done ? 'wrong' : '')) : ''}" data-o="${j}" ${done != null ? 'disabled' : ''}>${'ABCD'[j]}　${o}</button>`).join('') +
+    (done != null ? `<p class="hint"><b>${done === q.a ? '答對了' : '答錯了，正確答案是 ' + 'ABCD'[q.a]}</b>${q.e}<cite>依據：${q.s}</cite></p>` : '') +
+    `<div class="nav"><button class="btn ghost" id="qp" ${qPos ? '' : 'disabled'}>上一題</button><button class="btn" id="qn" ${qPos < qSet.length - 1 ? '' : 'disabled'}>下一題</button></div>` + fin + tools;
+  $$('#quiz-card .opt').forEach(b => b.onclick = () => { const j = +b.dataset.o; qAns[i] = j; qSave(); logRow('quiz_answers', { q_index: i + 1, chosen: j, correct: j === q.a }); renderQuiz(); renderHome(); });
+  $$('#quiz-card .qd').forEach(b => b.onclick = () => { qPos = +b.dataset.p; renderQuiz(); });
+  $('#qp').onclick = () => { qPos--; renderQuiz(); }; $('#qn').onclick = () => { qPos++; renderQuiz(); };
+  bindQuizTools();
+}
+function bindQuizTools() { $$('#quiz-card [data-qs]').forEach(b => b.onclick = () => { const m = b.dataset.qs;
+  if (m === 'all') startQuiz(Q_ALL, '全部 14 題');
+  else if (m === 'todo') startQuiz(Q_ALL.filter(i => qAns[i] == null), '未答的題目');
+  else if (m === 'wrong') { const w = Q_ALL.filter(i => qAns[i] != null && qAns[i] !== QUIZ[i].a); w.forEach(i => delete qAns[i]); qSave(); startQuiz(w, '重做錯題'); renderHome(); }
+  else { qAns = {}; qSave(); startQuiz(Q_ALL, '全部 14 題'); renderHome(); } }); }
+
+/* 學堂：內容取自簡報二，各堂題目對應 QUIZ 的題號（由 0 起算） */
+const LESSONS = [
+  { t: '代金是什麼：兩個情境的差額', ref: '簡報二 PART 01 估價邏輯', quiz: [],
+    pts: ['代金＝含容積移入之基地價格 − 未含容積移入之基地價格。', '同一塊基地估兩次：容移後（含移入容積）與容移前（未含移入容積），兩個都是正常價格。', '容移前的容積用「實際設計額度」，不是把各種獎勵算到上限。', '方法以土地開發分析法為主，比較法是第二種方法，兩法加權後決定單價。'],
+    w: `<div class="try"><h4>小試身手</h4><div class="grid"><label>含容積移入之基地價格<span class="u">億元</span><input type="number" id="t1a" value="60" inputmode="decimal"></label><label>未含容積移入之基地價格<span class="u">億元</span><input type="number" id="t1b" value="48" inputmode="decimal"></label><label>移入容積<span class="u">㎡</span><input type="number" id="t1c" value="2000" inputmode="decimal"></label></div><output id="t1o"></output></div>` },
+  { t: '土地開發分析法：代金為什麼對售價這麼敏感', ref: '簡報二 PART 01 估價邏輯', quiz: [], go: ['sens', '到「敏感度」自己拉拉看'],
+    pts: ['V＝S÷(1＋R)÷(1＋i)−(C＋M)。總銷 S 先扣掉利潤與利息，再扣直接成本 C 與間接成本 M，剩下的才是土地價格。', '單價先取位到千位，再乘土地坪數，得到總價。', '簡報示範案：住宅售價漲 5%，代金漲 9.6%；營造施工費漲 5%，代金跌 5.2%。', '原因：土地價格是殘值，代金又是兩個殘值相減，誤差會被放大。所以審議對售價特別敏感。'] },
+  { t: '容移前情境怎麼建：削頂與地下室', ref: '簡報二 PART 02 範本精讀（臺北市）', quiz: [13, 1, 2],
+    pts: ['業主通常只給容移後方案，容移前情境要估價師自己重建。', '地上層：實設建蔽率不變，減少的容積由頂層依次遞減（削頂），不是重新設計一棟樓。', '地下層二選一。減少樓層：開挖率維持與容移後相同。不減層、縮開挖率：縮減幅度以不超過容移後開挖率的 10% 為原則，超過就改為刪減一層。', '容移前車位至少要滿足法定車位數。'],
+    w: `<div class="try"><h4>開挖率下限算一下</h4><div class="grid"><label>容移後開挖率<span class="u">%</span><input type="number" id="t3a" value="70" inputmode="decimal"></label></div><output id="t3o"></output></div>` },
+  { t: '一致性：五個檢核', ref: '簡報二 PART 02 範本精讀', quiz: [12, 5], go: ['calc', '到「試算檢核」看燈號'],
+    pts: ['一、銷坪比一致。二、實設建蔽率一致。三、營造單價同一邏輯（都採下限、中間值或上限）。四、間接成本費率相同。五、檢核式：總銷增額大於總造價增額。', '檢核式不成立，代表移入容積沒有經濟價值，通常是售價或造價其中一邊設錯。', '比準戶單價原則上不因總樓層數不同而調整。均價差要由新增高樓層的樓層別效用支撐，成本不等於價值。', '兩個情境只能差在「容積」。參數不一致，代金就混進了參數差。'] },
+  { t: '開發年期、利潤率與造價加價', ref: '簡報二 PART 02 範本精讀（臺北市）', quiz: [3, 8, 10],
+    pts: ['臺北市：容移前後都不計都市更新審議期間，也不計容積代金審議期程。', '利潤率跟著開發年期查表。先確認年期算對，再查表。容移後年期較長，利潤率不應低於容移前。', '這張利潤率表只適用容積代金估價，其他估價回到第四號公報。', '綠建築按每坪金額加價，智慧建築按總工程造價比例加價，兩者計價基礎不同。'],
+    w: `<div class="try"><h4>查利潤率（臺北市範本）</h4><div class="grid"><label>開發年期<span class="u">年</span><input type="number" id="t5a" value="4.2" step="0.1" inputmode="decimal"></label></div><output id="t5o"></output></div>` },
+  { t: '比較法與容積率調整', ref: '簡報二 PART 02 範本精讀（臺北市）', quiz: [6, 7],
+    pts: ['建物成交案例：2 個以上、價格日期前後 1 年內、3 年內新成屋為原則，放寬要敘明理由。', '土地案例：基地規模與允建容積率要接近；不宜選透天且基地小於 100 坪的案例。', '比較標的容積率不同時，調整率用土地開發分析法試算兩個容積率下的地價求得，不是按容積率比例直線調整。', '容積率差異越大，調整修正係數越小。這就是邊際效益遞減。'] },
+  { t: '臺北與新北：別把一市的規定套到另一市', ref: '簡報二 PART 02 範本精讀', quiz: [0, 4, 9, 11],
+    pts: ['跨縣市最常見的錯，就是拿臺北的規定審新北的案子，或反過來。', '最容易錯的一項：審議期間。臺北不計入，新北依表加計。'],
+    w: `<div class="scroll"><table id="rules"><thead><tr><th>項目</th><th>臺北市</th><th>新北市</th></tr></thead><tbody id="rules-body"></tbody></table></div>` },
+  { t: '審議：一份報告要過幾關', ref: '簡報二 PART 03 審議流程與公會協檢（臺北市）', quiz: [], go: ['review', '到「審查演練」當一次協檢委員'],
+    pts: ['臺北市三層審議：公會協檢、專案小組（初審與複審）、審議委員會。', '流程：交辦後 7 日內開前期工作會議，三家估價，公會協檢，專案小組，最後審議會評議決定代金。', '前期工作會議的目的，是把三家估價師的容移前後量體參數對到一致。', '協檢看六類：基本資料、估價條件、土地開發分析法、土地比較法、價格決定、附件。', '審查意見的寫法：問題、依據、請補正事項。'] }
+];
+let lRead = {}; try { lRead = JSON.parse(localStorage.getItem('tdr_learn') || '{}'); } catch (e) {}
+function renderLearn() {
+  $('#lessons').innerHTML = LESSONS.map((L, k) => `<details class="lesson ${lRead[k] ? 'read' : ''}" data-k="${k}"><summary><span class="no">${lRead[k] ? '✓' : k + 1}</span><span>${L.t}</span></summary><div class="in"><ul class="pts">${L.pts.map(x => `<li>${x}</li>`).join('')}</ul>${L.w || ''}<p class="ref">出處：${L.ref}</p><div class="btns"><button class="btn" data-read="${k}" type="button">${lRead[k] ? '已看懂（再按取消）' : '我看懂了'}</button>${L.quiz.length ? `<button class="btn ghost" data-lq="${k}" type="button">做這一堂的 ${L.quiz.length} 題</button>` : ''}${L.go ? `<button class="btn ghost" data-go="${L.go[0]}" type="button">${L.go[1]}</button>` : ''}</div></div></details>`).join('');
+  $$('#lessons [data-read]').forEach(b => b.onclick = () => { const k = +b.dataset.read; if (lRead[k]) delete lRead[k]; else lRead[k] = 1; try { localStorage.setItem('tdr_learn', JSON.stringify(lRead)); } catch (e) {} const open = $$('#lessons details').map(d => d.open); renderLearn(); $$('#lessons details').forEach((d, j) => d.open = open[j] && !(j === k && lRead[k])); if (lRead[k] && $$('#lessons details')[k + 1]) { const n = $$('#lessons details')[k + 1]; n.open = true; n.scrollIntoView({ block: 'start', behavior: 'smooth' }); } renderHome(); });
+  $$('#lessons [data-lq]').forEach(b => b.onclick = () => { const L = LESSONS[+b.dataset.lq]; go('quiz'); startQuiz(L.quiz, '第 ' + (+b.dataset.lq + 1) + ' 堂：' + L.t); });
+  $$('#lessons [data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  const n = Object.keys(lRead).length; $('#learn-bar').style.width = n / LESSONS.length * 100 + '%'; $('#learn-sum').textContent = `已看懂 ${n} / ${LESSONS.length} 堂`;
+  fillRules(); bindTry();
+}
+function bindTry() {
+  const t1 = () => { const a = +$('#t1a').value, b = +$('#t1b').value, c = +$('#t1c').value, fee = (a - b) * 1e8, ping = c * PING; $('#t1o').textContent = (a > b && c > 0) ? `代金 ${nf(fee)} 元；移入 ${nf(ping, 2)} 坪；容積平均單價約 ${nf(fee / ping)} 元/坪` : '含移入的價格要大於未含移入的價格。'; };
+  const t3 = () => { const a = +$('#t3a').value; $('#t3o').textContent = a > 0 ? `不減層時，容移前開挖率不宜低於 ${nf(a * 0.9, 2)}%（縮減不超過容移後開挖率的 10%）。` : ''; };
+  const t5 = () => { const y = +$('#t5a').value, b = y > 0 ? profitBand('tpe', y) : null; $('#t5o').textContent = b ? `開發年期 ${y} 年，建議利潤率 ${b[0]}%～${b[1]}%${y >= 5 ? '（5 年以上，每增加 0.5 年加計 1%～2%）' : ''}` : ''; };
+  [['#t1a', t1], ['#t1b', t1], ['#t1c', t1], ['#t3a', t3], ['#t5a', t5]].forEach(([q, f]) => { const e = $(q); if (e) e.oninput = f; }); t1(); t3(); t5();
+}
+
+/* 首頁：進度與建議任務 */
+function renderHome() {
+  const n = Object.keys(lRead).length, q = qStat(), mine = who.grp && CASES[who.grp.toLowerCase()] ? who.grp.toLowerCase() : null;
+  $('#pg-learn').textContent = n ? `已看懂 ${n} / ${LESSONS.length}` : '從這裡開始';
+  $('#pg-quiz').textContent = q.d ? `已答 ${q.d} / ${q.n}，答對 ${q.c}` : '還沒作答';
+  $('#pg-case').textContent = state.key ? ({ nb: '目前：範例北安段', base: '目前：舊示範案' }[state.key] || '目前：' + state.key.toUpperCase()) : '目前：自訂參數';
+  const sidOk = /^[0-9A-Za-z]{6,12}$/.test(who.sid);
+  $('#who-chip').textContent = sidOk ? `${who.sid}${who.grp ? ' · ' + who.grp : ''}` : '尚未填學號';
+  const T = [
+    [sidOk && !!who.grp, '填好學號與組別', 'who'],
+    [n >= 5, `看完學堂第 1 到 5 堂（已看懂 ${Math.min(n, LESSONS.length)} 堂）`, 'learn'],
+    [q.d === q.n, `做完 14 題測驗（已答 ${q.d} 題）`, 'quiz'],
+    [q.c >= 10, `測驗答對 10 題以上（目前 ${q.c} 題）`, 'quiz'],
+    [!!mine && state.key === mine, mine ? `到「試算檢核」載入本組案件 ${who.grp}，核對量體` : '分組後，到「試算檢核」載入本組案件', 'calc']
+  ];
+  $('#tasks').innerHTML = T.map(([ok, t, to]) => `<li class="${ok ? 'done' : ''}"><i class="box">${ok ? '✓' : ''}</i><span>${t}</span>${ok ? '' : `<button class="mini" data-task="${to}" type="button">前往</button>`}</li>`).join('');
+  $('#task-bar').style.width = T.filter(x => x[0]).length / T.length * 100 + '%';
+  $$('#tasks [data-task]').forEach(b => b.onclick = () => { if (b.dataset.task === 'who') { go('home'); $('#who-sid').focus(); } else go(b.dataset.task); });
+  const pm = $('#pick-mine'); if (pm) { pm.hidden = !mine; if (mine) pm.textContent = `載入本組案件：${who.grp}`; }
 }
 
 /* 審查者模式 */
@@ -444,22 +586,27 @@ async function runAI(mode) { lastAiMode = mode; const p = buildPrompt(mode), out
   try { const res = await sampler(p, { onText: ({ text }) => out.textContent = text }); out.textContent = res.text; }
   catch (e) { out.textContent = '呼叫失敗（' + (e.code || '未知') + '）。請改用「複製提示詞」。'; } }
 
-function go(t) { $$('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.t === t)); $$('main > section').forEach(s => s.hidden = s.id !== t); try { location.hash = t; } catch (e) {} }
+const TABS = ['home', 'learn', 'quiz', 'calc', 'sens', 'review', 'ai'];
+function go(t) { if (t === 'rules') t = 'learn'; if (!TABS.includes(t)) t = 'home'; $$('.tab').forEach(b => { const on = b.dataset.t === t; b.setAttribute('aria-selected', on); if (on && b.scrollIntoView) b.scrollIntoView({ inline: 'center', block: 'nearest' }); }); $$('main > section').forEach(s => s.hidden = s.id !== t); try { history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} window.scrollTo(0, 0); }
 
+function fillRules() { const el = $('#rules-body'); if (!el) return;
+  el.innerHTML = `<tr><th>銷坪比取位</th><td>2 位（營建樓地板逾 20,000㎡ 取 3 位）</td><td>3 位</td></tr><tr><th>審議期間</th><td>${RULES.tpe.reviewNote}</td><td>${RULES.ntpc.reviewNote}</td></tr><tr><th>利潤率</th><td>依開發年期對照表：未滿1.5年 12~13%，每0.5年一級，4.5~5年 19~20%；${RULES.tpe.profitOver5}</td><td>未附對照表，依第四號公報說明</td></tr><tr><th>容移前地下室</th><td>減層則開挖率不變；縮開挖率以不超過容移後之 10% 為原則</td><td>容移前開挖率增減 10% 為原則</td></tr><tr><th>比較案例屋齡</th><td>3 年內新成屋</td><td>5 年內新成屋</td></tr><tr><th>價格日期</th><td>${RULES.tpe.priceDate}</td><td>${RULES.ntpc.priceDate}</td></tr><tr><th>小規模加價</th><td>依第四號公報</td><td>未達 2,500 坪或逾 7,500 坪，依四號公報第 16 條前後一同調整</td></tr><tr><th>代金比例</th><td>移入容積 50% 以上須繳納代金</td><td>可自由選擇</td></tr>`;
+}
 function init() {
   buildForm();
   $('#sens-ctl').innerHTML = SENS.map(([k, l, u, st]) => `<label for="s_${k}">${l}<output id="sv_${k}">0</output><input type="range" id="s_${k}" min="${u === '%' ? -20 : -3}" max="${u === '%' ? 20 : 3}" step="${u === '%' ? 1 : 0.25}" value="0"></label>`).join('');
   $$('#sens-ctl input').forEach(el => el.addEventListener('input', render));
   $('#sens-reset').onclick = () => { $$('#sens-ctl input').forEach(e => e.value = 0); render(); };
   $$('.tab').forEach(b => b.onclick = () => go(b.dataset.t));
-  $('#load-base').onclick = () => { reviewMode = false; $('#rv-box').hidden = true; loadCase('base'); };
+  $('#load-base').onclick = () => { reviewMode = false; $('#rv-box').hidden = true; loadCase('nb'); };
   $$('[data-review]').forEach(b => b.onclick = () => startReview(b.dataset.review));
   $('#rv-grade').onclick = gradeReview;
   $$('[data-ai]').forEach(b => b.onclick = () => runAI(b.dataset.ai));
   $('#ai-copy').onclick = async () => { const t = $('#ai-prompt'); if (!t.value) t.value = buildPrompt('grill'); try { await navigator.clipboard.writeText(t.value); $('#ai-copy').textContent = '已複製'; } catch (e) { t.select(); $('#ai-copy').textContent = '請長按全選複製'; } };
-  fillForm(); render(); renderQuiz();
-  const h = (location.hash || '').slice(1).split('&')[0]; if (['calc', 'sens', 'quiz', 'review', 'ai', 'rules'].includes(h)) go(h);
-  $('#rules-body').innerHTML = `<tr><th>銷坪比取位</th><td>2 位（營建樓地板逾 20,000㎡ 取 3 位）</td><td>3 位</td></tr><tr><th>審議期間</th><td>${RULES.tpe.reviewNote}</td><td>${RULES.ntpc.reviewNote}</td></tr><tr><th>利潤率</th><td>依開發年期對照表：未滿1.5年 12~13%，每0.5年一級，4.5~5年 19~20%；${RULES.tpe.profitOver5}</td><td>未附對照表，依第四號公報說明</td></tr><tr><th>容移前地下室</th><td>減層則開挖率不變；縮開挖率以不超過容移後之 10% 為原則</td><td>【待查證】本工具所讀新北資料未載明，先比照臺北原則提示</td></tr><tr><th>比較案例屋齡</th><td>3 年內新成屋</td><td>5 年內新成屋</td></tr><tr><th>價格日期</th><td>${RULES.tpe.priceDate}</td><td>${RULES.ntpc.priceDate}</td></tr><tr><th>小規模加價</th><td>依第四號公報</td><td>容移後總登記面積小於 2,500 坪，前後一同加價（建議 10% 以上）</td></tr><tr><th>代金比例</th><td>移入容積 50% 以上須繳納代金</td><td>可自由選擇</td></tr>`;
+  renderLearn(); fillForm(); render(); renderQuiz(); renderHome();
+  $$('#home [data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  $('#who-chip').onclick = () => { go('home'); $('#who-sid').focus(); };
+  const h = (location.hash || '').slice(1).split('&')[0]; if (TABS.includes(h) || h === 'rules') go(h);
   if (window.claude && claude.use) claude.use('sample').then(s => { if (s) { sampler = s; $('#ai-note').textContent = '已連線 AI，可直接在此頁對話。'; } });
 }
 document.addEventListener('DOMContentLoaded', init);
@@ -478,11 +625,13 @@ function caseFromUrl() {
   return CASES[k] ? k : null;
 }
 function initStart() {
-  $('#case-pick').onchange = e => { const k = e.target.value; if (!k) return; reviewMode = false; $('#rv-box').hidden = true; loadCase(k); history.replaceState(null, '', '?case=' + k); $('#start-msg').textContent = '已載入：' + CASES[k].name; };
-  $('#xcode-go').onclick = () => { try { state = parseCode($('#xcode').value); hintLv = {}; save(); fillForm(); render(); $('#start-msg').textContent = '匯入成功。代金與 Excel 若不同，先看「土開法權重」與比較法單價是否一致。'; }
+  $('#case-pick').onchange = e => { const k = e.target.value; if (!k) return; reviewMode = false; $('#rv-box').hidden = true; loadCase(k); history.replaceState(null, '', '?case=' + k + location.hash); $('#start-msg').textContent = '已載入：' + CASES[k].name; };
+  $('#xcode-go').onclick = () => { try { state = parseCode($('#xcode').value); hintLv = {}; save(); fillForm(); render(); if (window.renderHome) renderHome(); $('#start-msg').textContent = '匯入成功。代金與 Excel 若不同，先看「土開法權重」與比較法單價是否一致。'; }
     catch (e) { $('#start-msg').textContent = '匯入失敗：' + e.message; } };
   $('#share').onclick = async () => { const u = location.origin + location.pathname + (state.key ? '?case=' + state.key : ''); try { await navigator.clipboard.writeText(u); $('#start-msg').textContent = '已複製：' + u; } catch (e) { $('#start-msg').textContent = u; } };
-  const k = caseFromUrl(); if (k) loadCase(k);
+  $('#pick-nb').onclick = () => { reviewMode = false; $('#rv-box').hidden = true; loadCase('nb'); $('#start-msg').textContent = '已載入：' + CASES.nb.name; };
+  $('#pick-mine').onclick = () => { const k = (who.grp || '').toLowerCase(); if (!CASES[k]) return; reviewMode = false; $('#rv-box').hidden = true; loadCase(k); history.replaceState(null, '', '?case=' + k + location.hash); $('#start-msg').textContent = '已載入：' + CASES[k].name; };
+  const k = caseFromUrl(); if (k) { loadCase(k); if (!(location.hash || '').slice(1)) go('calc'); }
 }
 document.addEventListener('DOMContentLoaded', initStart);
 
@@ -502,7 +651,7 @@ function initCloud() {
   const sid = document.querySelector('#who-sid'), grp = document.querySelector('#who-grp');
   sid.value = who.sid || ''; grp.value = who.grp || '';
   const upd = () => { who.sid = sid.value.trim(); who.grp = grp.value.trim(); try { localStorage.setItem('tdr_who', JSON.stringify(who)); } catch (e) {}
-    setMsg(!SB.url ? '此版本未連線資料庫，作答不會上傳。' : (cloudOn() ? '已連線，作答與審查結果會自動記錄。' : '請輸入學號（6 至 12 碼英數字）後開始記錄。')); };
+    setMsg(!SB.url ? '此版本未連線資料庫，作答不會上傳。' : (cloudOn() ? '已開始記錄：測驗與審查演練的結果會自動送出。' : '請輸入學號（6 至 12 碼英數字）後開始記錄。')); renderHome(); };
   sid.addEventListener('input', upd); grp.addEventListener('input', upd); upd();
   document.querySelector('#case-save').onclick = async () => { const pin = document.querySelector('#case-pin').value.trim(), out = document.querySelector('#case-msg');
     if (!cloudOn() || !who.grp || pin.length < 4) { out.textContent = '需要學號、組別與至少 4 碼的組密碼。'; return; }
