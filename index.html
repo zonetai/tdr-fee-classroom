@@ -122,7 +122,7 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <button class="step" type="button" data-go="calc"><b>3 算</b><span>載入本組案件，看檢核燈號</span><em id="pg-case"></em></button>
 </div></div>
 <div class="card" id="who"><h2>先填學號與組別</h2><p class="sub" style="margin-bottom:8px">填了才會記錄測驗與審查演練的結果。資料存在這台裝置，下次打開不必重填。</p>
-<div class="grid"><label for="who-sid">學號<input id="who-sid" type="text" inputmode="text" autocomplete="off" maxlength="12" placeholder="例：112207001"></label><label for="who-grp">組別<select id="who-grp"><option value="">還沒分組</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select></label></div><p id="who-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
+<div class="grid"><label for="who-sid">學號<input id="who-sid" type="text" inputmode="text" autocomplete="off" maxlength="12" placeholder="例：112207001"></label><label for="who-grp">組別<select id="who-grp"><option value="">請選擇</option><option>第一組（G1）</option><option>第二組（G2）</option><option>第三組（G3）</option><option>第四組（G4）</option><option>第五組（G5）</option><option>第六組（G6）</option><option>第七組（G7）</option></select></label></div><p id="who-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
 <div class="card"><h2>建議進度</h2><div class="pbar"><i id="task-bar" style="width:0"></i></div><ul class="tasks" id="tasks"></ul></div>
 <div class="card"><h2>學會之後再玩</h2><div class="adv">
 <button type="button" data-go="sens"><b>敏感度</b><span>售價漲 5%，代金漲多少？拉拉看</span></button>
@@ -173,7 +173,7 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 </section>
 <section id="review" hidden>
 <div class="card"><h2>角色翻轉：你來當協檢委員</h2><p>載入一份有瑕疵的代金參數表。燈號會關閉，請自行判讀後勾選應提出的審查意見。漏審與誤判都會被記錄。</p><div class="btns" style="margin-top:12px"><button class="btn" data-review="flaw1">審查待審案 A</button><button class="btn" data-review="flaw2">審查待審案 B</button></div></div>
-<div class="card"><h2>審查同學的案子</h2><p>請對方把參數輸入「試算與檢核」分頁，你先不看燈號，口頭提出三點意見，再對照檢核結果。審查意見的品質列入平時成績。</p></div>
+<div class="card"><h2>審查同學的案子</h2><p>請對方把參數輸入「試算檢核」分頁，你先不看燈號，口頭提出三點意見，再對照檢核結果。審查意見的品質列入平時成績。</p></div>
 </section>
 <section id="ai" hidden>
 <div class="card"><h2>用目前案件資料問 AI</h2><p id="ai-note" style="font-size:13px;color:var(--mut)">此頁會把目前參數與檢核結果組成提示詞。</p>
@@ -553,7 +553,7 @@ function renderHome() {
     [n >= 5, `看完學堂第 1 到 5 堂（已看懂 ${Math.min(n, LESSONS.length)} 堂）`, 'learn'],
     [q.d === q.n, `做完 14 題測驗（已答 ${q.d} 題）`, 'quiz'],
     [q.c >= 10, `測驗答對 10 題以上（目前 ${q.c} 題）`, 'quiz'],
-    [!!mine && state.key === mine, mine ? `到「試算檢核」載入本組案件 ${who.grp}，核對量體` : '分組後，到「試算檢核」載入本組案件', 'calc']
+    [!!mine && state.key === mine, mine ? `到「試算檢核」載入本組案件 ${who.grp}，核對量體` : '選好組別後，到「試算檢核」載入本組案件', 'calc']
   ];
   $('#tasks').innerHTML = T.map(([ok, t, to]) => `<li class="${ok ? 'done' : ''}"><i class="box">${ok ? '✓' : ''}</i><span>${t}</span>${ok ? '' : `<button class="mini" data-task="${to}" type="button">前往</button>`}</li>`).join('');
   $('#task-bar').style.width = T.filter(x => x[0]).length / T.length * 100 + '%';
