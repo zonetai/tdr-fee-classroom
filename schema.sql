@@ -30,3 +30,11 @@ grant execute on function save_case(text, text, text, jsonb), load_case(text, te
 create or replace view quiz_summary as select student_id, max(group_code) as group_code, count(distinct q_index) as answered,
   count(distinct q_index) filter (where correct) as correct_any, min(created_at) as first_at, max(created_at) as last_at from quiz_answers group by student_id;
 alter view quiz_summary set (security_invoker = on);
+
+-- 修課名單核對（選用）。名單內容含學生個資，請只在 Supabase SQL Editor 匯入，不要寫進這個公開的 repo。
+create table if not exists roster (student_id text primary key, group_code text not null check (group_code ~ '^G[1-7]$'));
+alter table roster enable row level security;
+-- roster 不開放任何 anon 政策；學生端只能用下列函式查「這個學號屬於哪一組」，查不到回傳 null
+create or replace function check_student(p_sid text) returns text language sql security definer set search_path = public as $$
+  select group_code from roster where student_id = p_sid $$;
+grant execute on function check_student(text) to anon;

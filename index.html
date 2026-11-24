@@ -652,7 +652,15 @@ function initCloud() {
   sid.value = who.sid || ''; grp.value = who.grp || '';
   const upd = () => { who.sid = sid.value.trim(); who.grp = grp.value.trim(); try { localStorage.setItem('tdr_who', JSON.stringify(who)); } catch (e) {}
     setMsg(!SB.url ? '此版本未連線資料庫，作答不會上傳。' : (cloudOn() ? '已開始記錄：測驗與審查演練的結果會自動送出。' : '請輸入學號（6 至 12 碼英數字）後開始記錄。')); renderHome(); };
-  sid.addEventListener('input', upd); grp.addEventListener('input', upd); upd();
+  // 名單核對：資料庫有 check_student 函式時才啟用；查不到或函式不存在都不擋使用
+  let rosterT = null, rosterSid = '';
+  const rosterCheck = () => { clearTimeout(rosterT); if (!cloudOn() || who.sid === rosterSid) return;
+    rosterT = setTimeout(async () => { const s = who.sid; let g;
+      try { g = await sb('rpc/check_student', { p_sid: s }); } catch (e) { return; }
+      if (s !== who.sid) return; rosterSid = s;
+      if (g && /^G[1-7]$/.test(g)) { if (grp.value !== g) { grp.value = g; upd(); } setMsg('名單核對成功，已帶入你的組別。測驗與審查演練的結果會自動送出。'); }
+      else setMsg('修課名單裡找不到這個學號，請確認有沒有打錯。仍然可以使用，紀錄會照常送出。'); }, 600); };
+  sid.addEventListener('input', () => { upd(); rosterCheck(); }); grp.addEventListener('input', upd); upd(); rosterCheck();
   document.querySelector('#case-save').onclick = async () => { const pin = document.querySelector('#case-pin').value.trim(), out = document.querySelector('#case-msg');
     if (!cloudOn() || !who.grp || pin.length < 4) { out.textContent = '需要學號、組別與至少 4 碼的組密碼。'; return; }
     try { await sb('rpc/save_case', { p_group: who.grp, p_pin: pin, p_student: who.sid, p_data: state }); out.textContent = '已儲存本組參數。'; } catch (e) { out.textContent = '儲存失敗：' + e.message; } };
