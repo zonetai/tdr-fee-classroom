@@ -108,6 +108,7 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <button class="tab" role="tab" data-t="home" aria-selected="true">首頁</button>
 <button class="tab" role="tab" data-t="learn" aria-selected="false">學堂</button>
 <button class="tab" role="tab" data-t="quiz" aria-selected="false">測驗</button>
+<button class="tab" role="tab" data-t="quick" aria-selected="false">快算</button>
 <button class="tab" role="tab" data-t="calc" aria-selected="false">試算檢核</button>
 <button class="tab" role="tab" data-t="sens" aria-selected="false">敏感度</button>
 <button class="tab" role="tab" data-t="review" aria-selected="false">審查演練</button>
@@ -125,6 +126,7 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <div class="grid"><label for="who-sid">學號<input id="who-sid" type="text" inputmode="text" autocomplete="off" maxlength="12" placeholder="例：112207001"></label><label for="who-grp">組別<select id="who-grp"><option value="">請選擇</option><option value="G1">第一組（G1）</option><option value="G2">第二組（G2）</option><option value="G3">第三組（G3）</option><option value="G4">第四組（G4）</option><option value="G5">第五組（G5）</option><option value="G6">第六組（G6）</option><option value="G7">第七組（G7）</option></select></label></div><p id="who-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
 <div class="card"><h2>建議進度</h2><div class="pbar"><i id="task-bar" style="width:0"></i></div><ul class="tasks" id="tasks"></ul></div>
 <div class="card"><h2>學會之後再玩</h2><div class="adv">
+<button type="button" data-go="quick"><b>快算</b><span>只填十幾格，30 秒抓出代金量級</span></button>
 <button type="button" data-go="sens"><b>敏感度</b><span>售價漲 5%，代金漲多少？拉拉看</span></button>
 <button type="button" data-go="review"><b>審查演練</b><span>你當協檢委員，找出待審案的問題</span></button>
 <button type="button" data-go="ai"><b>AI 助教</b><span>讓 AI 扮委員質詢你，並留下使用紀錄</span></button>
@@ -144,6 +146,20 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 
 <section id="quiz" hidden><div class="card" id="quiz-card"></div></section>
 
+<section id="quick" hidden>
+<div class="card"><h2>快算：十幾格抓出代金量級</h2>
+<p class="sub">把雙情境土開法縮成一頁。量體用「容積率×銷坪比」推，容移前只填和容移後<b>不一樣</b>的地方。適合開案前抓量級、審查時反推對方數字。正式估價仍以「試算檢核」與 Excel 為準。</p>
+<div class="grid" style="margin-top:10px"><label for="qk-pick">帶入案件<select id="qk-pick"><option value="">（我的參數）</option><option value="tod">範例｜TOD 增額案（模擬，50% 回饋）</option><option value="nb">範例｜北安段（完整參數）</option><option value="g1">G1 新北汐止（只有量體）</option><option value="g2">G2 臺北大安（只有量體）</option><option value="g3">G3 臺北萬華（只有量體）</option><option value="g4">G4 新北永和（只有量體）</option><option value="g5">G5 新北中和（只有量體）</option><option value="g6">G6 新北中和 TOD（只有量體）</option><option value="g7">G7 臺中南屯（只有量體）</option><option value="cur">從「試算檢核」目前的參數帶入</option></select></label>
+<label for="qk-mode">金額性質<select id="qk-mode"><option value="100">容積代金（差額 100%）</option><option value="50">80 條之 2／TOD 回饋（差額 50%）</option><option value="x">自訂比例</option></select></label>
+<label for="qk-share" id="qk-share-l">回饋比例<span class="u">%</span><input id="qk-share" type="number" inputmode="decimal" step="any"></label></div>
+<p id="qk-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
+<p class="hint" id="qk-todo" hidden></p><div class="kpis" id="qk-kpi"></div>
+<div class="card"><h2>① 量體（容移前後共用）</h2><div class="grid" id="qk-f1"></div><p class="sub" id="qk-vol" style="margin-top:8px"></p></div>
+<div class="card"><h2>② 價格、成本、報酬</h2><p class="sub" style="margin-bottom:8px">右欄只在和容移後不同時才改。差距會顯示在下方，這幾個差距就是審查最常問的地方。</p><div id="qk-f2"></div><div class="grid" id="qk-f3" style="margin-top:8px"></div><ul class="plain" id="qk-gap" style="margin-top:10px;font-size:13px;gap:4px"></ul></div>
+<div class="card"><h2>哪個假設最敏感</h2><p class="sub" style="margin-bottom:8px">每次只動一個參數，看金額變動幅度。</p><div id="qk-tor"></div></div>
+<details class="fold"><summary>計算過程</summary><div class="in"><p style="font-size:12px;color:var(--mut)">V＝S÷(1＋R)÷(1＋i)−(C＋M)；S＝均價×銷售坪＋車位數×車位單價；C＝營造單價×(銷售坪＋車位數×每車位坪數)；M＝C×設計費率＋S×管銷稅費率。單位：萬元</p>
+<div class="scroll"><table><thead><tr><th></th><th>容積坪</th><th>銷售坪</th><th>總銷 S</th><th>直接成本 C</th><th>間接成本 M</th><th>土地總價 V</th><th>土地單價</th></tr></thead><tbody id="qk-steps"></tbody></table></div><p class="sub" id="qk-cmp" style="margin-top:8px"></p></div></details>
+</section>
 <section id="calc" hidden>
 <div class="card" id="start"><h2>① 選案件</h2>
 <div class="btns" style="margin-bottom:10px"><button class="btn" id="pick-nb" type="button">載入範例：北安段</button><button class="btn ghost" id="pick-mine" type="button" hidden></button></div>
@@ -586,7 +602,7 @@ async function runAI(mode) { lastAiMode = mode; const p = buildPrompt(mode), out
   try { const res = await sampler(p, { onText: ({ text }) => out.textContent = text }); out.textContent = res.text; }
   catch (e) { out.textContent = '呼叫失敗（' + (e.code || '未知') + '）。請改用「複製提示詞」。'; } }
 
-const TABS = ['home', 'learn', 'quiz', 'calc', 'sens', 'review', 'ai'];
+const TABS = ['home', 'learn', 'quiz', 'quick', 'calc', 'sens', 'review', 'ai'];
 function go(t) { if (t === 'rules') t = 'learn'; if (!TABS.includes(t)) t = 'home'; $$('.tab').forEach(b => { const on = b.dataset.t === t; b.setAttribute('aria-selected', on); if (on && b.scrollIntoView) b.scrollIntoView({ inline: 'center', block: 'nearest' }); }); $$('main > section').forEach(s => s.hidden = s.id !== t); try { history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} window.scrollTo(0, 0); }
 
 function fillRules() { const el = $('#rules-body'); if (!el) return;
@@ -610,6 +626,93 @@ function init() {
   if (window.claude && claude.use) claude.use('sample').then(s => { if (s) { sampler = s; $('#ai-note').textContent = '已連線 AI，可直接在此頁對話。'; } });
 }
 document.addEventListener('DOMContentLoaded', init);
+/* 快算：事務所速算表邏輯（容積率×銷坪比推量體，容移前只填差異）。與完整引擎獨立，單位為萬元、坪。 */
+const QK_F1 = [['landM2', '基地面積', '㎡'], ['farLegal', '法定容積率', '%'], ['bonus', '其他獎勵（占法定容積）', '%'], ['add', '移入或放寬量（占法定容積）', '%'], ['ratio', '銷坪比', '倍'], ['parkArea', '每車位登記面積', '坪']];
+const QK_F2 = [['price', '房屋均價', '萬/坪'], ['parkN', '車位數', '個'], ['parkPrice', '車位單價', '萬/個'], ['cost', '營造單價', '萬/坪'], ['R', '利潤率', '%'], ['i', '資本利息綜合利率', '%']];
+const QK_F3 = [['ind', '廣銷＋管理＋稅捐（占總銷）', '%'], ['des', '規劃設計費（占營造費）', '%']];
+const QK_TOD = { name: '範例：TOD 增額案（模擬）', landM2: 5000, farLegal: 225, bonus: 70, add: 30, ratio: 1.58, parkArea: 8.5, ind: 9, des: 0, share: 50,
+  aft: { price: 150, parkN: 340, parkPrice: 400, cost: 32, R: 16, i: 7.5 }, bef: { price: 146.7, parkN: 295, parkPrice: 400, cost: 30, R: 15, i: 7.05 } };
+let qk = clone(QK_TOD);
+try { const s = localStorage.getItem('tdr_quick'); if (s) qk = JSON.parse(s); } catch (e) {}
+const qkSave = () => { try { localStorage.setItem('tdr_quick', JSON.stringify(qk)); } catch (e) {} };
+const r2 = x => Math.round(x * 100) / 100;
+function qkFrom(c) {
+  const lp = c.landM2 * PING, legal = c.farLegal > 0 ? c.farLegal : c.farBef, sc = s => { const sell = s.resArea + (s.shopArea || 0);
+    return { price: sell > 0 && s.resPrice > 0 ? r2((s.resArea * s.resPrice + (s.shopArea || 0) * (s.shopPrice || 0)) / sell / 1e4) : 0, parkN: s.parkN, parkPrice: r2(s.parkPrice / 1e4), cost: r2(s.cost / 1e4), R: s.R, i: s.i }; };
+  const sellA = c.aft.resArea + (c.aft.shopArea || 0);
+  return { name: c.name, landM2: c.landM2, farLegal: legal, bonus: r2((c.farBef / legal - 1) * 100), add: r2((c.farAft - c.farBef) / legal * 100),
+    ratio: Math.round(sellA / (lp * c.farAft / 100) * 1e4) / 1e4, parkArea: c.aft.regArea > 0 && c.aft.parkN > 0 ? r2((c.aft.regArea - sellA) / c.aft.parkN) : 8.5,
+    ind: (c.aft.adv + c.aft.mgmt + c.aft.tax) || 9, des: c.aft.design || 0, share: 100, aft: sc(c.aft), bef: sc(c.bef) };
+}
+function qkScen(q, s, far) {
+  const lp = q.landM2 * PING, vol = lp * far / 100, sell = vol * q.ratio;
+  const S = s.price * sell + s.parkN * s.parkPrice, C = s.cost * (sell + s.parkN * q.parkArea), M = C * q.des / 100 + S * q.ind / 100;
+  const V = S / (1 + s.R / 100) / (1 + s.i / 100) - (C + M);
+  return { vol, sell, S, C, M, V, unit: V / lp };
+}
+function qkCalc(q) {
+  const farB = q.farLegal * (1 + q.bonus / 100), farA = farB + q.farLegal * q.add / 100, lp = q.landM2 * PING;
+  const a = qkScen(q, q.aft, farA), b = qkScen(q, q.bef, farB), diff = a.V - b.V, addPing = lp * q.farLegal * q.add / 1e4;
+  return { farA, farB, lp, a, b, diff, fee: diff * q.share / 100, addPing, perPing: diff / addPing, volUnit: a.unit / (farA / 100), dS: a.S - b.S, dC: (a.C + a.M) - (b.C + b.M) };
+}
+const wan = x => Math.abs(x) >= 1e4 ? nf(x / 1e4, 2) + ' 億元' : nf(x, 0) + ' 萬元';
+function qkBuild() {
+  const inp = (id, k, s, l) => `<input id="${id}" data-k="${k}"${s ? ` data-s="${s}"` : ''} type="number" inputmode="decimal" step="any" aria-label="${l}">`;
+  $('#qk-f1').innerHTML = QK_F1.map(([k, l, u]) => `<label for="qk_${k}">${l}<span class="u">${u}</span>${inp('qk_' + k, k, '', l)}</label>`).join('');
+  $('#qk-f2').innerHTML = `<div class="pair head"><span></span><b>容移後</b><b>容移前</b></div>` + QK_F2.map(([k, l, u]) => `<div class="pair"><span>${l}<i class="u">${u}</i></span>${inp('qka_' + k, k, 'aft', '容移後' + l)}${inp('qkb_' + k, k, 'bef', '容移前' + l)}</div>`).join('');
+  $('#qk-f3').innerHTML = QK_F3.map(([k, l, u]) => `<label for="qk_${k}">${l}<span class="u">${u}</span>${inp('qk_' + k, k, '', l)}</label>`).join('');
+  $$('#quick input[data-k]').forEach(el => el.addEventListener('input', () => { const v = parseFloat(el.value); if (isNaN(v)) return;
+    if (el.dataset.s) qk[el.dataset.s][el.dataset.k] = v; else qk[el.dataset.k] = v; qk.key = ''; $('#qk-pick').value = ''; qkSave(); qkRender(); }));
+  $('#qk-share').addEventListener('input', e => { const v = parseFloat(e.target.value); if (isNaN(v)) return; qk.share = v; qkSave(); qkRender(); });
+  $('#qk-mode').onchange = e => { if (e.target.value !== 'x') qk.share = +e.target.value; qk.custom = e.target.value === 'x'; qkSave(); qkFill(); qkRender(); };
+  $('#qk-pick').onchange = e => { const k = e.target.value; if (!k) return;
+    qk = k === 'tod' ? clone(QK_TOD) : qkFrom(k === 'cur' ? state : CASES[k]); qk.key = k === 'cur' ? '' : k; qkSave(); qkFill(); qkRender();
+    $('#qk-msg').textContent = '已帶入：' + qk.name + (qk.aft.price > 0 ? '' : '。量體已填好，請補上價格、成本與報酬。'); };
+}
+function qkFill() {
+  QK_F1.concat(QK_F3).forEach(([k]) => $('#qk_' + k).value = qk[k] ?? '');
+  QK_F2.forEach(([k]) => { $('#qka_' + k).value = qk.aft[k] || ''; $('#qkb_' + k).value = qk.bef[k] || ''; });
+  $('#qk-mode').value = qk.custom ? 'x' : (qk.share === 100 || qk.share === 50 ? String(qk.share) : 'x'); $('#qk-share').value = qk.share; $('#qk-share-l').hidden = $('#qk-mode').value !== 'x';
+  $('#qk-pick').value = qk.key || '';
+}
+function qkRender() {
+  const q = qk, ready = q.landM2 > 0 && q.farLegal > 0 && q.add > 0 && q.ratio > 0 && ['aft', 'bef'].every(k => q[k].price > 0 && q[k].cost > 0);
+  const farB = q.farLegal * (1 + q.bonus / 100), farA = farB + q.farLegal * q.add / 100;
+  $('#qk-vol').textContent = q.landM2 > 0 ? `允建容積率：容移前 ${nf(farB, 2)}% → 容移後 ${nf(farA, 2)}%；基地 ${nf(q.landM2 * PING, 2)} 坪；增加容積 ${nf(q.landM2 * PING * q.farLegal * q.add / 1e4, 2)} 坪` : '';
+  $('#qk-todo').hidden = ready;
+  if (!ready) { $('#qk-todo').innerHTML = '<b>還差幾格</b>量體之外，請填容移後與容移前的房屋均價、營造單價，以及利潤率、利率。填齊就會出數字。'; $('#qk-kpi').innerHTML = ''; $('#qk-gap').innerHTML = ''; $('#qk-tor').innerHTML = ''; $('#qk-steps').innerHTML = ''; $('#qk-cmp').textContent = ''; return; }
+  const r = qkCalc(q), A = q.aft, B = q.bef, label = q.share === 100 ? '容積代金（快算）' : `回饋金額（差額×${q.share}%）`;
+  $('#qk-kpi').innerHTML = [
+    [label, wan(r.fee), `土地總價差額 ${wan(r.diff)}＝容移後 ${wan(r.a.V)} − 容移前 ${wan(r.b.V)}`],
+    ['增加容積單價', nf(r.perPing, 1) + '<small> 萬/坪</small>', `差額÷增加容積 ${nf(r.addPing, 1)} 坪`],
+    ['土地單價', `${nf(r.a.unit, 1)}<small> ← ${nf(r.b.unit, 1)}</small>`, '萬/坪，容移後 ← 容移前'],
+    ['市價比', (r.perPing / r.volUnit).toFixed(3), '增加容積單價 ÷ 容移後容積單價'],
+    ['房價比', (r.perPing / A.price).toFixed(3), '增加容積單價 ÷ 房屋均價']
+  ].map(([t, v, s], i) => `<div class="kpi${i ? '' : ' main'}"><span>${t}</span><b>${v}</b><em>${s}</em></div>`).join('');
+  const g = [], pd = (1 - B.price / A.price) * 100;
+  g.push([B.price > A.price ? 'warn' : 'note', `容移前均價比容移後低 ${pd.toFixed(2)}%（${nf(A.price - B.price, 2)} 萬/坪）。差距要有新增樓層的效用支撐。`]);
+  g.push([B.cost > A.cost ? 'warn' : 'note', `容移前營造單價比容移後低 ${nf(A.cost - B.cost, 2)} 萬/坪（${((1 - B.cost / A.cost) * 100).toFixed(2)}%）。樓層或構造等級有沒有跨級？`]);
+  g.push([B.R > A.R ? 'warn' : 'note', `利潤率差 ${nf(A.R - B.R, 2)} 個百分點、利率差 ${nf(A.i - B.i, 2)} 個百分點。兩者都跟開發年期走。`]);
+  g.push([r.dS > r.dC ? 'ok' : 'warn', `總銷增加 ${wan(r.dS)}，直接加間接成本增加 ${wan(r.dC)}。${r.dS > r.dC ? '總銷增額大於成本增額。' : '總銷增額沒有大於成本增額，移入容積不具經濟價值，回頭檢查售價與造價。'}`]);
+  $('#qk-gap').innerHTML = g.map(([lv, t]) => `<li class="${lv}">${lv === 'warn' ? '▲ ' : lv === 'ok' ? '✓ ' : '・'}${t}</li>`).join('');
+  const sh = f => { const c = clone(q); f(c); return qkCalc(c).fee; };
+  const T = [['容移前後均價同漲跌 ±5%', c => { c.aft.price *= .95; c.bef.price *= .95; }, c => { c.aft.price *= 1.05; c.bef.price *= 1.05; }],
+    ['容移前均價 ±1%（改變價差）', c => { c.bef.price *= .99; }, c => { c.bef.price *= 1.01; }],
+    ['容移前後營造同漲跌 ±5%', c => { c.aft.cost *= .95; c.bef.cost *= .95; }, c => { c.aft.cost *= 1.05; c.bef.cost *= 1.05; }],
+    ['容移前營造單價 ±1 萬/坪', c => { c.bef.cost -= 1; }, c => { c.bef.cost += 1; }],
+    ['容移前利潤率 ±1 個百分點', c => { c.bef.R -= 1; }, c => { c.bef.R += 1; }],
+    ['容移前利率 ±0.5 個百分點', c => { c.bef.i -= .5; }, c => { c.bef.i += .5; }],
+    ['銷坪比 ±0.05', c => { c.ratio -= .05; }, c => { c.ratio += .05; }]];
+  const rows = T.map(([l, lo, hi]) => { const a = (sh(lo) - r.fee) / Math.abs(r.fee) * 100, b = (sh(hi) - r.fee) / Math.abs(r.fee) * 100; return { l, lo: Math.min(a, b), hi: Math.max(a, b), w: Math.max(Math.abs(a), Math.abs(b)) }; }).sort((x, y) => y.w - x.w);
+  const mx = Math.max(...rows.map(x => x.w), 1);
+  $('#qk-tor').innerHTML = rows.map(x => `<div class="tr" style="grid-template-columns:minmax(0,11em) 1fr minmax(0,8.5em)"><span>${x.l}</span><div class="bar"><i style="left:${50 + x.lo / mx * 48}%;width:${(x.hi - x.lo) / mx * 48}%"></i></div><b>${x.lo.toFixed(1)}% ~ +${x.hi.toFixed(1)}%</b></div>`).join('');
+  $('#qk-steps').innerHTML = [['容移後', r.a], ['容移前', r.b]].map(([n, x]) => `<tr><th>${n}</th><td>${nf(x.vol, 1)}</td><td>${nf(x.sell, 1)}</td><td>${nf(x.S)}</td><td>${nf(x.C)}</td><td>${nf(x.M)}</td><td>${nf(x.V)}</td><td>${nf(x.unit, 1)}</td></tr>`).join('');
+  let cmp = '';
+  if (q.key && CASES[q.key] && CASES[q.key].aft.resPrice > 0 && CASES[q.key].aft.cost > 0) { const f = calc(CASES[q.key]); cmp = `對照「試算檢核」完整參數（只用土開法）：${nf(f.feeLand)} 元；快算差額 ${nf(r.diff * 1e4)} 元，相差 ${((r.diff * 1e4 / f.feeLand - 1) * 100).toFixed(2)}%。差異來自銷坪比共用一個數、單價取位與車位面積攤算。`; }
+  $('#qk-cmp').textContent = cmp;
+}
+document.addEventListener('DOMContentLoaded', () => { qkBuild(); qkFill(); qkRender(); });
+
 /* Excel 交換碼：ZT1|city=..|land=..|in=..|far=後/前|w=..|A=樓上面積,樓上均價,地面面積,地面均價,車位數,車位均價,營造,總登記,設計%,廣銷%,管理%,稅捐%,R%,i%,年期,地上,地下,開挖%[,比較法]|B=… */
 function parseCode(t) {
   t = (t || '').trim().replace(/^"|"$/g, ''); if (!t.startsWith('ZT1|')) throw new Error('交換碼要以 ZT1| 開頭');
