@@ -153,7 +153,8 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <div class="grid" style="margin-top:10px"><label for="qk-pick">帶入案件<select id="qk-pick"><option value="">（我的參數）</option><option value="tod">範例｜TOD 增額案（模擬，50% 回饋）</option><option value="e802">範例｜80 條之 2 放寬案（模擬，淨利益 50%）</option><option value="nb">範例｜北安段（完整參數）</option><option value="fy">富宇案（簡報競標題，只有量體）</option><option value="g1">G1 新北汐止（只有量體）</option><option value="g2">G2 臺北大安（只有量體）</option><option value="g3">G3 臺北萬華（只有量體）</option><option value="g4">G4 新北永和（只有量體）</option><option value="g5">G5 新北中和（只有量體）</option><option value="g6">G6 新北中和 TOD（只有量體）</option><option value="g7">G7 臺中南屯（只有量體）</option><option value="cur">從「試算檢核」目前的參數帶入</option></select></label>
 <label for="qk-mode">金額性質<select id="qk-mode"><option value="fee">容積代金（土地價差 100%）</option><option value="tod">TOD 回饋（土地價差 × 50%）</option><option value="802">80 條之 2 回饋（淨利益 × 50%）</option><option value="x">自訂比例（土地價差）</option></select></label>
 <label for="qk-share" id="qk-share-l">回饋比例<span class="u">%</span><input id="qk-share" type="number" inputmode="decimal" step="any"></label></div>
-<p id="qk-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
+<p id="qk-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p>
+<p class="hint" style="margin-top:8px"><b>同時申請兩種以上容積時</b>二段式（臺北市、桃園市）要分段、分別計算各項容積的價金，每一段各做一次前後比較；一段式（新北市）先算出全部容積的總價金，再依各項申請比例拆分金額。本頁一次只算一組前後差額：二段式請每一段各算一次，一段式請用總移入量算一次後自行按比例拆分。</p></div>
 <p class="hint" id="qk-todo" hidden></p><div class="kpis" id="qk-kpi"></div>
 <div class="card"><h2>① 量體（容移前後共用）</h2><div class="grid" id="qk-f1"></div><p class="sub" id="qk-vol" style="margin-top:8px"></p></div>
 <div class="card"><h2>② 價格、成本、報酬</h2><p class="sub" style="margin-bottom:8px">右欄只在和容移後不同時才改。容移前車位較少，每車位分攤的面積通常較大；有公益設施等不可售面積時，請一併攤進每車位登記面積。差距會顯示在下方，這幾個差距就是審查最常問的地方。</p><div id="qk-f2"></div><div class="grid" id="qk-f3" style="margin-top:8px"></div><ul class="plain" id="qk-gap" style="margin-top:10px;font-size:13px;gap:4px"></ul></div>
@@ -377,7 +378,7 @@ CASES.nb = { name: '範例：臺北市中山區北安段（審議會版，114.04
 CASES.g1 = { name: "G1 新北市汐止區 住宅大基地案（價格日期 110 年）", city: 'ntpc', landM2: 47846.75, inM2: 40191.27, farLegal: 210, farBef: 315, farAft: 399, legalPark: 0, wLand: 70,
   aft: {floorsUp: 22, floorsDown: 3, digRate: 0, bcr: 50, regArea: 0, resArea: 86624.75, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 2392, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
   bef: {floorsUp: 18, floorsDown: 2, digRate: 0, bcr: 50, regArea: 0, resArea: 68387.96, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 1650, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
-CASES.g2 = { name: "G2 臺北市大安區 SRC 住宅案（容移後／容移前；TOD 回饋獎勵前請另以 Excel 計算）", city: 'tpe', landM2: 3157, inM2: 3314.85, farLegal: 300, farBef: 495, farAft: 599.91, legalPark: 0, wLand: 70,
+CASES.g2 = { name: "G2 臺北市大安區 SRC 住宅案（容移後／容移前；臺北市採二段式，TOD 回饋那一段須另外分別計算）", city: 'tpe', landM2: 3157, inM2: 3314.85, farLegal: 300, farBef: 495, farAft: 599.91, legalPark: 0, wLand: 70,
   aft: {floorsUp: 22, floorsDown: 5, digRate: 73.93, bcr: 50, regArea: 0, resArea: 8596.85, resPrice: 0, shopArea: 246.78, shopPrice: 0, parkN: 249, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
   bef: {floorsUp: 18, floorsDown: 4, digRate: 73.93, bcr: 50, regArea: 0, resArea: 7043.5, resPrice: 0, shopArea: 253.84, shopPrice: 0, parkN: 200, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
 CASES.g3 = { name: "G3 臺北市萬華區 古蹟容移案（虛擬比準地，容積率 225% → 315%）", city: 'tpe', landM2: 2677.5, inM2: 2409.75, farLegal: 225, farBef: 225, farAft: 315, legalPark: 0, wLand: 70,
