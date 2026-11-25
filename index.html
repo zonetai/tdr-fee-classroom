@@ -159,10 +159,10 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <div class="card"><h2>② 價格、成本、報酬</h2><p class="sub" style="margin-bottom:8px">右欄只在和容移後不同時才改。容移前車位較少，每車位分攤的面積通常較大；有公益設施等不可售面積時，請一併攤進每車位登記面積。差距會顯示在下方，這幾個差距就是審查最常問的地方。</p><div id="qk-f2"></div><div class="grid" id="qk-f3" style="margin-top:8px"></div><ul class="plain" id="qk-gap" style="margin-top:10px;font-size:13px;gap:4px"></ul></div>
 <div class="card"><h2>哪個假設最敏感</h2><p class="sub" style="margin-bottom:8px">每次只動一個參數，看金額變動幅度。</p><div id="qk-tor"></div></div>
 <div class="card" id="qs-card"><h2>移入量對照：容積移得越多，前後差異越大</h2>
-<p class="sub" style="margin-bottom:8px">以上方「容移前」那一欄為基準，依移入量自動推估容移後的樓層、工期，再帶出營造單價、利潤率、資本利息綜合利率的差異與代金。每一格建議值都可以改，改過的格子會加框，按「還原建議值」回到所選縣市的預設。</p>
+<p class="sub" style="margin-bottom:8px">以上方「容移前」那一欄為基準，依移入量自動推估容移後的樓層、工期，再查第四號公報造價表與範本利潤率表，帶出營造單價、利潤率、資本利息綜合利率的差異與代金。每一格建議值都可以改，改過的格子會加框，按「還原建議值」回到所選縣市的預設。</p>
 <div class="grid"><label for="qs-city">適用做法<select id="qs-city"><option value="tpe">臺北市</option><option value="ntpc">新北市</option></select></label></div>
 <div class="grid" id="qs-f" style="margin-top:8px"></div>
-<div class="btns" style="margin:10px 0"><button class="btn ghost" id="qs-reset">還原建議值</button><button class="btn" id="qs-apply">把目前移入量的建議值填入「容移後」欄</button></div>
+<div class="btns" style="margin:10px 0"><button class="btn ghost" id="qs-reset">還原建議值</button><button class="btn" id="qs-apply">把目前移入量的建議值填入「容移後」欄</button><button class="btn ghost" id="qs-cost">容移前營造單價改用查表值</button></div>
 <p class="hint" id="qs-todo" hidden></p>
 <div class="scroll"><table><thead><tr><th>移入量</th><th>容移後容積率</th><th>樓層</th><th>工期</th><th>營造單價</th><th>利潤率</th><th>綜合利率</th><th>代金或回饋</th><th>三項都不調</th><th>高估</th></tr></thead><tbody id="qs-rows"></tbody></table></div>
 <p class="sub" id="qs-note" style="margin-top:8px"></p>
@@ -659,7 +659,7 @@ function qkFrom(c) {
   const sellA = c.aft.resArea + (c.aft.shopArea || 0);
   return { name: c.name, landM2: c.landM2, farLegal: legal, bonus: r2((c.farBef / legal - 1) * 100), add: r2((c.farAft - c.farBef) / legal * 100),
     ratio: Math.round(sellA / (lp * c.farAft / 100) * 1e4) / 1e4,
-    sens: Object.assign({ city: c.city === 'ntpc' ? 'ntpc' : 'tpe', fb: c.bef.floorsUp || 20, bb: c.bef.floorsDown || 4 }, QS_DEF[c.city === 'ntpc' ? 'ntpc' : 'tpe']), ind: (c.aft.adv + c.aft.mgmt + c.aft.tax) || 9, des: c.aft.design || 0, fin: 1.63, share: 100, mode: 'fee', aft: sc(c.aft), bef: sc(c.bef) };
+    sens: Object.assign({ city: c.city === 'ntpc' ? 'ntpc' : 'tpe', fb: c.bef.floorsUp || 20, bb: c.bef.floorsDown || 4, yb: c.bef.years || 4 }, QS_DEF[c.city === 'ntpc' ? 'ntpc' : 'tpe']), ind: (c.aft.adv + c.aft.mgmt + c.aft.tax) || 9, des: c.aft.design || 0, fin: 1.63, share: 100, mode: 'fee', aft: sc(c.aft), bef: sc(c.bef) };
 }
 function qkScen(q, s, far) {
   const lp = q.landM2 * PING, vol = lp * far / 100, sell = vol * q.ratio;
@@ -687,49 +687,89 @@ function qkBuild() {
     qk = k === 'tod' ? clone(QK_TOD) : k === 'e802' ? clone(QK_802) : k === 'fy' ? clone(QK_FY) : qkFrom(k === 'cur' ? state : CASES[k]); qk.key = k === 'cur' ? '' : k; qkSave(); qkFill(); qkRender();
     $('#qk-msg').textContent = '已帶入：' + qk.name + (qk.aft.price > 0 ? '' : (qk.ratio > 0 ? '。量體已填好，請補上價格、成本與報酬。' : '。容積已填好，請自行判斷銷坪比、價格、成本與報酬。')); };
 }
-/* 移入量對照：以容移前為基準，依移入量推估容移後樓層、工期，再帶出造價、利潤率、綜合利率差異。建議值可改，QS_DEF 為各縣市預設。 */
-const QS_DEF = { tpe: { mUp: 1.2, mDn: 2.5, rStep: 1, iYr: 1.6, cUp: 1.2, cDn: 1, pUp: 0.6 }, ntpc: { mUp: 1, mDn: 2, rStep: 1.5, iYr: 1.6, cUp: 1.2, cDn: 1, pUp: 0.6 } };
-const QS_F = [['fb', '容移前地上樓層', '層'], ['bb', '容移前地下樓層', '層'], ['mUp', '地上每增一層，工期加', '月'], ['mDn', '地下每增一層，工期加', '月'], ['rStep', '開發年期每差 0.5 年，利潤率差', '百分點'], ['iYr', '開發年期每差 1 年，綜合利率差', '百分點'], ['cUp', '地上每增一層，營造單價加', '%'], ['cDn', '地下每增一層，營造單價加', '%'], ['pUp', '地上每增一層，房屋均價加', '%']];
+/* 移入量對照：以容移前為基準，依移入量推估容移後樓層、工期，再查表帶出造價、利潤率差異。QS_COST 為第四號公報（113 年 12 月適用，物價基期 113 年 11 月）鋼筋混凝土造住宅、辦公室標準表，單位千元/坪。 */
+const QS_ROWS = [3, 5, 8, 10, 13, 15, 18, 20, 25, 30, 35, 40], QS_STDB = [0, 0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4], QS_BADD = [0.3, 0.4, 0.5, 0.6];
+const QS_COST = {
+  tpe: { cut: [75, 100, 125, 150, 180, 210], t: [
+    [[97,124],[113,150],[133,180],[158,217],[189,263],[222,293],[256,330]], [[102,127],[118,154],[138,184],[162,221],[194,265],[225,295],[260,332]],
+    [[122,150],[137,176],[157,206],[181,242],[212,287],[244,317],[278,354]], [[127,154],[141,179],[161,209],[186,245],[216,289],[248,318],[282,355]],
+    [[138,168],[152,193],[172,222],[196,258],[226,302],[258,331],[291,367]], [[142,170],[157,196],[176,224],[200,260],[230,304],[261,332],[295,368]],
+    [[157,188],[171,214],[190,242],[215,277],[244,320],[274,349],[308,385]], [[160,191],[175,216],[195,245],[218,280],[248,322],[278,350],[311,386]],
+    [[164,200],[177,224],[197,253],[221,288],[249,330],[279,358],[311,394]], [[189,228],[203,253],[222,281],[245,316],[274,358],[304,385],[336,420]],
+    [null,[211,260],[230,288],[252,323],[281,365],[310,392],[343,426]], [null,[217,269],[236,296],[259,330],[288,372],[317,398],[348,433]]] },
+  ntpc: { cut: [20, 30, 50, 75, 100], t: [
+    [[72.8,93.6],[75.1,92],[78.4,116],[98,120],[111,138],[129,164]], [[77.3,98.4],[79.6,96.6],[82.9,121],[102,125],[115,143],[133,169]],
+    [[95.2,118],[97.5,115],[106,139],[120,143],[133,161],[151,187]], [[100,123],[102,120],[111,144],[125,148],[138,166],[156,192]],
+    [[111,135],[114,132],[122,155],[136,160],[149,177],[167,203]], [[116,140],[118,136],[126,160],[140,164],[153,182],[171,208]],
+    [[130,155],[133,151],[141,175],[155,179],[168,197],[186,223]], [[135,160],[137,156],[145,179],[159,184],[172,201],[190,227]],
+    [[140,166],[143,161],[151,185],[165,189],[178,207],[196,233]], [[164,191],[166,186],[175,209],[188,214],[202,231],[220,257]],
+    [null,[174,194],[182,217],[196,222],[209,242],[227,268]], [null,[182,202],[190,225],[204,230],[217,249],[235,275]]] }
+};
+const QS_NTPC_R = { cut: [20, 30, 50, 70], lo: [13.5, 12.5, 11.5, 10.5, 10], inc: [0, 1, 2, 3, 4, 4.5, 5] };
+const QS_DEF = { tpe: { mUp: 1.2, mDn: 2.5, rStep: 1, iYr: 1.6, pos: 50, sAdd: 0, dig: 60, idx: 1, pUp: 0.6 }, ntpc: { mUp: 1, mDn: 2, rStep: 1.5, iYr: 1.6, pos: 50, sAdd: 0, dig: 60, idx: 1, pUp: 0.6 } };
+const QS_F = [['fb', '容移前地上樓層', '層'], ['bb', '容移前地下樓層', '層'], ['yb', '容移前開發年期', '年'], ['mUp', '地上每增一層，工期加', '月'], ['mDn', '地下每增一層，工期加', '月'],
+  ['pos', '造價取公報上下限之間的位置（0 下限，100 上限）', '%'], ['sAdd', '鋼骨或 SRC 加價（公報 2.5~5.5）', '萬/坪'], ['dig', '地下室開挖率（算超挖加計用）', '%'], ['idx', '物價調整（價格日期指數÷113 年 11 月指數）', '倍'],
+  ['rStep', '超過利潤率表最高級距後，每 0.5 年再加', '百分點'], ['iYr', '開發年期每差 1 年，綜合利率差', '百分點'], ['pUp', '地上每增一層，房屋均價加', '%']];
 const QS_SRC = {
-  tpe: ['<b>利潤率</b>：臺北市容積代金估價報告書範本（114 年修正版）利潤率表，開發年期每 0.5 年一個級距、每級距差 1 個百分點；本表以工期差跨幾個級距估算。5 年以上每增 0.5 年加計 1%~2%。',
+  tpe: ['<b>利潤率</b>：臺北市容積代金估價報告書範本（114 年修正版）利潤率表，開發年期未滿 1.5 年 12%~13%，每 0.5 年一個級距、每級距加 1 個百分點，到 4.5~5 年為 19%~20%；5 年以上每增 0.5 年加計 1%~2%（本表預設 1）。前後取同一位置（中間值）相減。',
     '<b>工期</b>：地上每層 1.2 個月、地下每層 2.5 個月是事務所簡表預設，不是範本規定【臺北市工期推估依據待確認】。臺北市範本容移前後均不計都更與代金審議期間。'],
-  ntpc: ['<b>利潤率</b>：新北市容移代金（增額容積價金）估價報告書範本利潤率表，依平均房價水準與開發年期分級；事務所核定案引用「開發年期每 0.5 年差異 1.5%」，本表按比例估算。開發年期 4.0 年以上已是最高級距，超過後由估價師敘明理由判斷【完整級距表數值待確認】。',
+  ntpc: ['<b>利潤率</b>：新北市容移代金及增額容積價金估價報告書範本（修訂 111.4.20）利潤率表，依平均房價水準（未達 20 萬、20~30 萬、30~50 萬、50~70 萬、70 萬以上）與開發年期（未滿 1.5 年起每 0.5 年一級距，4.0 年以上為最高級距）查表，前後取同一位置相減；範本規定容移前後選用邏輯應相同。超過 4.0 年後每 0.5 年再加 1.5 個百分點，是事務所核定案的寫法，不是範本數字。老師提供的「公會協檢估價報告書範本（新版）」是掃描檔，尚未逐字比對利潤率表是否與此相同【待確認】。',
     '<b>工期</b>：地下層依新北市都市更新權利變換計畫提列共同負擔項目及金額基準，地下 1 層 4 個月、每多開挖 1 層增加 2 個月；地上每層 1 個月為事務所核定案的排法【待確認】。新北市有都更、都審等審查者另加計審查期間。'],
-  all: ['<b>營造單價</b>：正式估價依估價師公會全聯會第四號公報營造或施工費標準表，按構造與樓層級距查表，跨級距時會跳升，地下層超挖另加計。每層 1.2%、地下每層 1% 是事務所代金案的經驗值（各案每層約 1%~5%），不是公報數值【正式作業請回查公報原文】。',
+  all: ['<b>營造單價</b>：估價師公會全聯會第四號公報營造或施工費標準表（113 年 12 月適用），鋼筋混凝土造住宅、辦公室，依縣市、平均房價水準與地上樓層級距查上下限。前後都用「容移前均價」所在的房價級距，避免只因樓層效用跨級距。容移後營造單價＝您填的容移前單價 ×（容移後查表值÷容移前查表值）。樓層跨過公報級距（例如 25 層到 26 層）時造價會跳升，代金不一定隨移入量平順增加。',
+    '<b>鋼骨、SRC</b>：公報第 5 點，得按鋼筋混凝土造單價每坪加計 25,000~55,000 元，請自行填入。',
+    '<b>地下層</b>：公報第 6 點，標準表已含地下層（6~10 層 1 層、11~15 層 2 層、16~25 層 3 層、26~40 層 4 層）；增減的樓層以該層實際面積加減不超過 30%、40%、50%、60%。本表以「基地面積×開挖率」當每層地下室面積、取上限估算。地上增加 4 層以上時假設地下多 1 層、9 層以上多 2 層，是事務所案件常見情形，實際依法定車位與開挖率檢討。',
+    '<b>物價調整</b>：公報第 14 點，標準表物價基期為 113 年 11 月，依所在地直轄市、縣市政府公布的營造工程物價指數（建築工程類）調整，未公布者用行政院主計總處指數。請填「價格日期指數÷113 年 11 月指數」，預設 1 表示未調整。',
+    '<b>未納入</b>：樓高加計、連續壁、制震、綠建築與智慧建築、逆打等加價項目（公報第 7、8、13 點），以及超過 40 層的建物（公報第 17 點），正式估價需另計。',
     '<b>資本利息綜合利率</b>：依不動產估價技術規則，由資金來源利率、土地與建物價值比率、開發年期與建築年期計算。每年 1.6 個百分點是事務所四個正式案回推的經驗值。',
-    '<b>地下層</b>：地上增加 4 層以上時假設地下多 1 層、9 層以上多 2 層，是事務所案件的常見情形，實際依法定車位與開挖率檢討。',
     '<b>房屋均價</b>：樓層升高帶來的樓層別效用，每層 0.6% 為事務所案件經驗值。車位數依容積比例增加。',
     '本表是教學用的量級推估，不能取代正式估價的量體規劃與查表。']
 };
-function qsInit() { if (!qk.sens) qk.sens = Object.assign({ city: 'tpe', fb: 20, bb: 4 }, QS_DEF.tpe); }
+function qsInit() { if (!qk.sens) qk.sens = { city: 'tpe', fb: 20, bb: 4 }; const s = qk.sens, d = QS_DEF[s.city] || QS_DEF.tpe; for (const k in d) if (s[k] == null) s[k] = d[k]; if (s.yb == null) s.yb = 4; delete s.cUp; delete s.cDn; }
+const qsBand = (cut, v) => { let i = 0; while (i < cut.length && v >= cut[i]) i++; return i; };
+function qsCost(q, price, F, B, area) {
+  const s = q.sens, T = QS_COST[s.city]; let r = QS_ROWS.findIndex(x => F <= x); if (r < 0) r = QS_ROWS.length - 1;
+  let c = qsBand(T.cut, price); while (!T.t[r][c]) c++;
+  const [lo, hi] = T.t[r][c], base = lo + (hi - lo) * s.pos / 100, ex = Math.round(B - QS_STDB[r]), ab = q.landM2 * PING * s.dig / 100; let up = 0;
+  for (let j = 0; j < Math.abs(ex); j++) up += QS_BADD[Math.min(j, 3)] * Math.sign(ex);
+  return { unit: (base * (1 + (area > 0 ? up * ab / area : 0)) / 10 + s.sAdd) * s.idx, lo, hi, row: r, col: c, over: F > 40 };
+}
+function qsProfit(s, price, y) {
+  const i = y < 1.5 ? 0 : Math.floor((y - 1.5) / 0.5 + 1e-9) + 1;
+  if (s.city === 'tpe') return y >= 5 ? 19.5 + (Math.floor((y - 5) / 0.5 + 1e-9) + 1) * s.rStep : 12.5 + Math.min(i, 7);
+  const N = QS_NTPC_R; return N.lo[qsBand(N.cut, price)] + 0.75 + N.inc[Math.min(i, 6)] + (y > 4 ? Math.round((y - 4) / 0.5 * s.rStep * 2) / 2 : 0);
+}
 function qsAuto(q, add) {
-  const s = q.sens, farB = q.farLegal * (1 + q.bonus / 100), farA = farB + q.farLegal * add / 100;
+  const s = q.sens, lp = q.landM2 * PING, farB = q.farLegal * (1 + q.bonus / 100), farA = farB + q.farLegal * add / 100, B = q.bef;
   const dF = Math.max(0, Math.round(s.fb * farA / farB) - s.fb), dB = dF >= 9 ? 2 : dF >= 4 ? 1 : 0, dY = (dF * s.mUp + dB * s.mDn) / 12;
-  const dR = s.city === 'tpe' ? Math.round(dY / 0.5) * s.rStep : Math.round(dY / 0.5 * s.rStep * 2) / 2, dI = r2(dY * s.iYr), dC = dF * s.cUp + dB * s.cDn, dP = dF * s.pUp, B = q.bef;
-  const aft = { price: r2(B.price * (1 + dP / 100)), parkN: Math.round(B.parkN * farA / farB), parkPrice: B.parkPrice, parkArea: q.aft.parkArea || B.parkArea, cost: r2(B.cost * (1 + dC / 100)), R: r2(B.R + dR), i: r2(B.i + dI) };
-  return { farA, farB, dF, dB, dY, dR, dI, dC, dP, aft };
+  const dR = r2(qsProfit(s, B.price, s.yb + dY) - qsProfit(s, B.price, s.yb)), dI = r2(dY * s.iYr), dP = dF * s.pUp, parkN = Math.round(B.parkN * farA / farB), pa = q.aft.parkArea || B.parkArea || 0;
+  const tb = qsCost(q, B.price, s.fb, s.bb, lp * farB / 100 * q.ratio + B.parkN * (B.parkArea || 0)), ta = qsCost(q, B.price, s.fb + dF, s.bb + dB, lp * farA / 100 * q.ratio + parkN * pa), dC = (ta.unit / tb.unit - 1) * 100;
+  const aft = { price: r2(B.price * (1 + dP / 100)), parkN, parkPrice: B.parkPrice, parkArea: pa, cost: r2(B.cost * ta.unit / tb.unit), R: r2(B.R + dR), i: r2(B.i + dI) };
+  return { farA, farB, dF, dB, dY, dR, dI, dC, dP, aft, ta, tb };
 }
 function qsBuild() {
   $('#qs-f').innerHTML = QS_F.map(([k, l, u]) => `<label for="qs_${k}">${l}<span class="u">${u}</span><input id="qs_${k}" data-sk="${k}" type="number" inputmode="decimal" step="any" aria-label="${l}"></label>`).join('');
-  $$('#qs-f input').forEach(el => el.addEventListener('input', () => { const v = parseFloat(el.value); if (isNaN(v) || v < 0) return; qk.sens[el.dataset.sk] = v; qkSave(); qsRender(); }));
+  $$('#qs-f input').forEach(el => el.addEventListener('input', () => { const v = parseFloat(el.value); if (isNaN(v) || v < 0 || (el.dataset.sk === 'idx' && v === 0)) return; qk.sens[el.dataset.sk] = v; qkSave(); qsRender(); }));
   $('#qs-city').onchange = e => { Object.assign(qk.sens, QS_DEF[e.target.value], { city: e.target.value }); qkSave(); qsFill(); qsRender(); };
   $('#qs-reset').onclick = () => { Object.assign(qk.sens, QS_DEF[qk.sens.city]); qkSave(); qsFill(); qsRender(); };
   $('#qs-apply').onclick = () => { if (!(qk.bef.price > 0 && qk.bef.cost > 0)) return; Object.assign(qk.aft, qsAuto(qk, qk.add).aft); qk.key = ''; qkSave(); qkFill(); qkRender();
     $('#qk-msg').textContent = '已依移入量對照的建議值填入「容移後」欄，可再逐格調整。'; };
+  $('#qs-cost').onclick = () => { if (!(qk.bef.price > 0 && qk.ratio > 0)) return; qk.bef.cost = r2(qsAuto(qk, qk.add || 10).tb.unit); qk.key = ''; qkSave(); qkFill(); qkRender();
+    $('#qk-msg').textContent = '容移前營造單價已改用第四號公報查表值（含物價調整），可再調整。'; };
 }
 function qsFill() { qsInit(); $('#qs-city').value = qk.sens.city; QS_F.forEach(([k]) => $('#qs_' + k).value = qk.sens[k] ?? ''); }
 function qsRender() {
   qsInit(); const q = qk, s = q.sens, d = QS_DEF[s.city], B = q.bef; let nMod = 0;
   QS_F.forEach(([k]) => { const m = k in d && s[k] !== d[k]; if (m) nMod++; $('#qs_' + k).style.outline = m ? '2px solid #d97706' : ''; });
   $('#qs-src').innerHTML = '<ul class="plain" style="gap:6px">' + QS_SRC[s.city].concat(QS_SRC.all).map(t => `<li>${t}</li>`).join('') + '</ul>';
-  const ok = q.landM2 > 0 && q.farLegal > 0 && q.ratio > 0 && B.price > 0 && B.cost > 0 && s.fb > 0 && q.mode !== '802';
-  $('#qs-todo').hidden = ok; $('#qs-apply').disabled = !ok;
-  if (!ok) { $('#qs-todo').innerHTML = q.mode === '802' ? '<b>不適用</b>80 條之 2 以淨利益計算，不扣利潤與資本利息，本表只適用土地價差法。' : '<b>還差幾格</b>請先填上方的量體、銷坪比，以及「容移前」的房屋均價與營造單價。'; $('#qs-rows').innerHTML = ''; $('#qs-note').textContent = ''; return; }
-  const adds = [...new Set([10, 20, 30, 40, 50].concat(q.add > 0 ? [r2(q.add)] : []))].sort((a, b) => a - b), sg = (x, n) => (x > 0 ? '+' : '') + x.toFixed(n);
+  const okT = q.landM2 > 0 && q.farLegal > 0 && q.ratio > 0 && B.price > 0 && s.fb > 0 && q.mode !== '802', ok = okT && B.cost > 0;
+  $('#qs-todo').hidden = ok; $('#qs-apply').disabled = !ok; $('#qs-cost').disabled = !okT;
+  if (!ok) { $('#qs-todo').innerHTML = q.mode === '802' ? '<b>不適用</b>80 條之 2 以淨利益計算，不扣利潤與資本利息，本表只適用土地價差法。' : '<b>還差幾格</b>請先填上方的量體、銷坪比，以及「容移前」的房屋均價與營造單價。只填了均價時，可先按「容移前營造單價改用查表值」。'; $('#qs-rows').innerHTML = ''; $('#qs-note').textContent = ''; return; }
+  const adds = [...new Set([10, 20, 30, 40, 50].concat(q.add > 0 ? [r2(q.add)] : []))].sort((a, b) => a - b), sg = (x, n) => (x > 0 ? '+' : '') + x.toFixed(n); let over = false, cur0 = null;
   $('#qs-rows').innerHTML = adds.map(add => { const a = qsAuto(q, add), f = qkCalc(Object.assign({}, q, { add, aft: a.aft })).diff * q.share / 100,
-    f0 = qkCalc(Object.assign({}, q, { add, aft: Object.assign({}, a.aft, { cost: B.cost, R: B.R, i: B.i }) })).diff * q.share / 100, cur = add === r2(q.add);
-    return `<tr${cur ? ' style="font-weight:700;background:rgba(217,119,6,.12)"' : ''}><td>${add}%${cur ? '（目前）' : ''}</td><td>${nf(a.farA, 2)}%</td><td>${s.fb + a.dF}F／B${s.bb + a.dB}<br><small>${sg(a.dF, 0)} 層${a.dB ? '、地下 ' + sg(a.dB, 0) : ''}</small></td><td>${sg(a.dY, 2)} 年</td><td>${nf(a.aft.cost, 2)}<br><small>${sg(a.dC, 1)}%</small></td><td>${nf(a.aft.R, 1)}%<br><small>${sg(a.dR, 1)}</small></td><td>${nf(a.aft.i, 2)}%<br><small>${sg(a.dI, 2)}</small></td><td>${wan(f)}</td><td>${wan(f0)}</td><td>${f > 0 ? sg((f0 / f - 1) * 100, 0) + '%' : '－'}</td></tr>`; }).join('');
-  $('#qs-note').textContent = `基準：容移前 ${s.fb}F／B${s.bb}，均價 ${nf(B.price, 1)} 萬/坪、營造 ${nf(B.cost, 2)} 萬/坪、利潤率 ${nf(B.R, 1)}%、綜合利率 ${nf(B.i, 2)}%。「三項都不調」是容移後沿用容移前的營造單價、利潤率與綜合利率時的金額，「高估」是它比建議值算法多出的比例。` + (nMod ? `目前有 ${nMod} 格建議值被改過。` : '');
+    f0 = qkCalc(Object.assign({}, q, { add, aft: Object.assign({}, a.aft, { cost: B.cost, R: B.R, i: B.i }) })).diff * q.share / 100, cur = add === r2(q.add); if (a.ta.over) over = true; if (cur || !cur0) cur0 = a;
+    return `<tr${cur ? ' style="font-weight:700;background:rgba(217,119,6,.12)"' : ''}><td>${add}%${cur ? '（目前）' : ''}</td><td>${nf(a.farA, 2)}%</td><td>${s.fb + a.dF}F／B${s.bb + a.dB}<br><small>${sg(a.dF, 0)} 層${a.dB ? '、地下 ' + sg(a.dB, 0) : ''}</small></td><td>${nf(s.yb + a.dY, 2)} 年<br><small>${sg(a.dY, 2)}</small></td><td>${nf(a.aft.cost, 2)}<br><small>${sg(a.dC, 1)}%，查表 ${nf(a.ta.unit, 2)}</small></td><td>${nf(a.aft.R, 1)}%<br><small>${sg(a.dR, 1)}</small></td><td>${nf(a.aft.i, 2)}%<br><small>${sg(a.dI, 2)}</small></td><td>${wan(f)}</td><td>${wan(f0)}</td><td>${f > 0 ? sg((f0 / f - 1) * 100, 0) + '%' : '－'}</td></tr>`; }).join('');
+  const tb = cur0.tb, gap = (B.cost / tb.unit - 1) * 100;
+  $('#qs-note').textContent = `基準：容移前 ${s.fb}F／B${s.bb}、開發年期 ${nf(s.yb, 2)} 年，均價 ${nf(B.price, 1)} 萬/坪、營造 ${nf(B.cost, 2)} 萬/坪、利潤率 ${nf(B.R, 1)}%、綜合利率 ${nf(B.i, 2)}%。容移前查表值 ${nf(tb.unit, 2)} 萬/坪（公報級距 ${nf(tb.lo / 10, 2)}~${nf(tb.hi / 10, 2)}${s.idx !== 1 ? '，物價調整 ×' + s.idx : '，尚未做物價調整'}），您填的容移前單價比查表值${gap >= 0 ? '高' : '低'} ${Math.abs(gap).toFixed(1)}%。「三項都不調」是容移後沿用容移前的營造單價、利潤率與綜合利率時的金額，「高估」是它比建議值算法多出的比例。` + (over ? '有情境超過 40 層，公報標準表未涵蓋，以最高級距代入。' : '') + (nMod ? `目前有 ${nMod} 格建議值被改過。` : '');
 }
 function qkFill() {
   QK_F1.concat(QK_F3).forEach(([k]) => $('#qk_' + k).value = qk[k] ?? '');
