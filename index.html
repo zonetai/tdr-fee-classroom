@@ -156,7 +156,7 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <p id="qk-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
 <p class="hint" id="qk-todo" hidden></p><div class="kpis" id="qk-kpi"></div>
 <div class="card"><h2>① 量體（容移前後共用）</h2><div class="grid" id="qk-f1"></div><p class="sub" id="qk-vol" style="margin-top:8px"></p></div>
-<div class="card"><h2>② 價格、成本、報酬</h2><p class="sub" style="margin-bottom:8px">右欄只在和容移後不同時才改。差距會顯示在下方，這幾個差距就是審查最常問的地方。</p><div id="qk-f2"></div><div class="grid" id="qk-f3" style="margin-top:8px"></div><ul class="plain" id="qk-gap" style="margin-top:10px;font-size:13px;gap:4px"></ul></div>
+<div class="card"><h2>② 價格、成本、報酬</h2><p class="sub" style="margin-bottom:8px">右欄只在和容移後不同時才改。容移前車位較少，每車位分攤的面積通常較大；有公益設施等不可售面積時，請一併攤進每車位登記面積。差距會顯示在下方，這幾個差距就是審查最常問的地方。</p><div id="qk-f2"></div><div class="grid" id="qk-f3" style="margin-top:8px"></div><ul class="plain" id="qk-gap" style="margin-top:10px;font-size:13px;gap:4px"></ul></div>
 <div class="card"><h2>哪個假設最敏感</h2><p class="sub" style="margin-bottom:8px">每次只動一個參數，看金額變動幅度。</p><div id="qk-tor"></div></div>
 <details class="fold"><summary>計算過程</summary><div class="in"><p style="font-size:12px;color:var(--mut)">V＝S÷(1＋R)÷(1＋i)−(C＋M)；S＝均價×銷售坪＋車位數×車位單價；C＝營造單價×(銷售坪＋車位數×每車位坪數)；M＝C×設計費率＋S×管銷稅費率。80 條之 2：回饋＝〔總銷增加 −（營造＋設計＋融資利息＋管銷）增加〕× 比例，再除以放寬後均價換算樓地板。單位：萬元</p>
 <div class="scroll"><table><thead><tr><th></th><th>容積坪</th><th>銷售坪</th><th>總銷 S</th><th>直接成本 C</th><th>間接成本 M</th><th>土地總價 V</th><th>土地單價</th></tr></thead><tbody id="qk-steps"></tbody></table></div><p class="sub" id="qk-cmp" style="margin-top:8px"></p></div></details>
@@ -628,29 +628,30 @@ function init() {
 }
 document.addEventListener('DOMContentLoaded', init);
 /* 快算：事務所速算表邏輯（容積率×銷坪比推量體，容移前只填差異）。與完整引擎獨立，單位為萬元、坪。 */
-const QK_F1 = [['landM2', '基地面積', '㎡'], ['farLegal', '法定容積率', '%'], ['bonus', '其他獎勵（占法定容積）', '%'], ['add', '移入或放寬量（占法定容積）', '%'], ['ratio', '銷坪比', '倍'], ['parkArea', '每車位登記面積', '坪']];
-const QK_F2 = [['price', '房屋均價', '萬/坪'], ['parkN', '車位數', '個'], ['parkPrice', '車位單價', '萬/個'], ['cost', '營造單價', '萬/坪'], ['R', '利潤率', '%'], ['i', '資本利息綜合利率', '%']];
+const QK_F1 = [['landM2', '基地面積', '㎡'], ['farLegal', '法定容積率', '%'], ['bonus', '其他獎勵（占法定容積）', '%'], ['add', '移入或放寬量（占法定容積）', '%'], ['ratio', '銷坪比', '倍']];
+const QK_F2 = [['price', '房屋均價', '萬/坪'], ['parkN', '車位數', '個'], ['parkPrice', '車位單價', '萬/個'], ['parkArea', '每車位登記面積', '坪/個'], ['cost', '營造單價', '萬/坪'], ['R', '利潤率', '%'], ['i', '資本利息綜合利率', '%']];
 const QK_F3 = [['ind', '廣銷＋管理＋稅捐（占總銷）', '%'], ['des', '規劃設計費（占營造費）', '%'], ['fin', '融資利息（占營造費，僅 80 條之 2）', '%']];
-const QK_802 = { name: '範例：80 條之 2 放寬案（模擬）', mode: '802', landM2: 5000, farLegal: 225, bonus: 80, add: 20, ratio: 1.58, parkArea: 8.5, ind: 11, des: 5.75, fin: 1.63, share: 50,
-  aft: { price: 150, parkN: 340, parkPrice: 400, cost: 36.5, R: 16, i: 7.5 }, bef: { price: 147, parkN: 295, parkPrice: 400, cost: 34.3, R: 15, i: 7.05 } };
-const QK_TOD = { name: '範例：TOD 增額案（模擬）', mode: 'tod', fin: 1.63, landM2: 5000, farLegal: 225, bonus: 70, add: 30, ratio: 1.58, parkArea: 8.5, ind: 9, des: 0, share: 50,
-  aft: { price: 150, parkN: 340, parkPrice: 400, cost: 32, R: 16, i: 7.5 }, bef: { price: 146.7, parkN: 295, parkPrice: 400, cost: 30, R: 15, i: 7.05 } };
+const QK_802 = { name: '範例：80 條之 2 放寬案（模擬）', mode: '802', landM2: 5000, farLegal: 225, bonus: 80, add: 20, ratio: 1.58, ind: 11, des: 5.75, fin: 1.63, share: 50,
+  aft: { price: 150, parkN: 340, parkPrice: 400, parkArea: 8.5, cost: 36.5, R: 16, i: 7.5 }, bef: { price: 147, parkN: 295, parkPrice: 400, parkArea: 8.5, cost: 34.3, R: 15, i: 7.05 } };
+const QK_TOD = { name: '範例：TOD 增額案（模擬）', mode: 'tod', fin: 1.63, landM2: 5000, farLegal: 225, bonus: 70, add: 30, ratio: 1.58, ind: 9, des: 0, share: 50,
+  aft: { price: 150, parkN: 340, parkPrice: 400, parkArea: 8.5, cost: 32, R: 16, i: 7.5 }, bef: { price: 146.7, parkN: 295, parkPrice: 400, parkArea: 8.5, cost: 30, R: 15, i: 7.05 } };
 let qk = clone(QK_TOD);
 try { const s = localStorage.getItem('tdr_quick'); if (s) qk = JSON.parse(s); } catch (e) {}
 if (!qk.mode) qk.mode = qk.custom ? 'x' : qk.share === 100 ? 'fee' : qk.share === 50 ? 'tod' : 'x'; if (qk.fin == null) qk.fin = 1.63;
+if (qk.aft.parkArea == null) { qk.aft.parkArea = qk.bef.parkArea = qk.parkArea ?? 8.5; delete qk.parkArea; }
 const qkSave = () => { try { localStorage.setItem('tdr_quick', JSON.stringify(qk)); } catch (e) {} };
 const r2 = x => Math.round(x * 100) / 100;
 function qkFrom(c) {
   const lp = c.landM2 * PING, legal = c.farLegal > 0 ? c.farLegal : c.farBef, sc = s => { const sell = s.resArea + (s.shopArea || 0);
-    return { price: sell > 0 && s.resPrice > 0 ? r2((s.resArea * s.resPrice + (s.shopArea || 0) * (s.shopPrice || 0)) / sell / 1e4) : 0, parkN: s.parkN, parkPrice: r2(s.parkPrice / 1e4), cost: r2(s.cost / 1e4), R: s.R, i: s.i }; };
+    return { parkArea: s.regArea > 0 && s.parkN > 0 ? r2((s.regArea - sell) / s.parkN) : 8.5, price: sell > 0 && s.resPrice > 0 ? r2((s.resArea * s.resPrice + (s.shopArea || 0) * (s.shopPrice || 0)) / sell / 1e4) : 0, parkN: s.parkN, parkPrice: r2(s.parkPrice / 1e4), cost: r2(s.cost / 1e4), R: s.R, i: s.i }; };
   const sellA = c.aft.resArea + (c.aft.shopArea || 0);
   return { name: c.name, landM2: c.landM2, farLegal: legal, bonus: r2((c.farBef / legal - 1) * 100), add: r2((c.farAft - c.farBef) / legal * 100),
-    ratio: Math.round(sellA / (lp * c.farAft / 100) * 1e4) / 1e4, parkArea: c.aft.regArea > 0 && c.aft.parkN > 0 ? r2((c.aft.regArea - sellA) / c.aft.parkN) : 8.5,
+    ratio: Math.round(sellA / (lp * c.farAft / 100) * 1e4) / 1e4,
     ind: (c.aft.adv + c.aft.mgmt + c.aft.tax) || 9, des: c.aft.design || 0, fin: 1.63, share: 100, mode: 'fee', aft: sc(c.aft), bef: sc(c.bef) };
 }
 function qkScen(q, s, far) {
   const lp = q.landM2 * PING, vol = lp * far / 100, sell = vol * q.ratio;
-  const S = s.price * sell + s.parkN * s.parkPrice, C = s.cost * (sell + s.parkN * q.parkArea), M = C * q.des / 100 + S * q.ind / 100;
+  const S = s.price * sell + s.parkN * s.parkPrice, C = s.cost * (sell + s.parkN * s.parkArea), M = C * q.des / 100 + S * q.ind / 100;
   const V = S / (1 + s.R / 100) / (1 + s.i / 100) - (C + M);
   return { vol, sell, S, C, M, V, unit: V / lp, cost802: C * (1 + (q.des + (q.fin || 0)) / 100) + S * q.ind / 100 };
 }
