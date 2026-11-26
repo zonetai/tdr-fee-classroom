@@ -150,7 +150,7 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <section id="quick" hidden>
 <div class="card"><h2>快算：十幾格抓出代金量級</h2>
 <p class="sub">把雙情境土開法縮成一頁。量體用「容積率×銷坪比」推，容移前只填和容移後<b>不一樣</b>的地方。適合開案前抓量級、審查時反推對方數字。正式估價仍以「試算檢核」與 Excel 為準。</p>
-<div class="grid" style="margin-top:10px"><label for="qk-pick">帶入案件<select id="qk-pick"><option value="">（我的參數）</option><option value="tod">範例｜TOD 增額案（模擬，50% 回饋）</option><option value="e802">範例｜80 條之 2 放寬案（模擬，淨利益 50%）</option><option value="nb">範例｜北安段（完整參數）</option><option value="fy">富宇案（簡報競標題，只有量體）</option><option value="g1">G1 新北汐止（只有量體）</option><option value="g2">G2 臺北大安（只有量體）</option><option value="g3">G3 臺北萬華（只有量體）</option><option value="g4">G4 新北永和（只有量體）</option><option value="g5">G5 新北中和（只有量體）</option><option value="g6">G6 新北中和 TOD（只有量體）</option><option value="g7">G7 臺中南屯（只有量體）</option><option value="cur">從「試算檢核」目前的參數帶入</option></select></label>
+<div class="grid" style="margin-top:10px"><label for="qk-pick">帶入案件<select id="qk-pick"><option value="">（我的參數）</option><option value="tod">範例｜TOD 增額案（模擬，50% 回饋）</option><option value="e802">範例｜80 條之 2 放寬案（模擬，淨利益 50%）</option><option value="nb">範例｜北安段（完整參數）</option><option value="fy">富宇案（簡報競標題，只有量體）</option><option value="g1">G1 新北汐止（只有量體）</option><option value="g2">G2 臺北大安 容積代金段（只有量體）</option><option value="g3">G3 臺北北投（只有量體）</option><option value="g4">G4 新北永和（只有量體）</option><option value="g5">G5 臺北信義 TOD＋增額（只有量體）</option><option value="g6">G6 臺北大安 TOD 回饋段（只有量體）</option><option value="g7">G7 新北林口（只有量體）</option><option value="cur">從「試算檢核」目前的參數帶入</option></select></label>
 <label for="qk-mode">金額性質<select id="qk-mode"><option value="fee">容積代金（土地價差 100%）</option><option value="tod">TOD 回饋（土地價差 × 50%）</option><option value="802">80 條之 2 回饋（淨利益 × 50%）</option><option value="x">自訂比例（土地價差）</option></select></label>
 <label for="qk-share" id="qk-share-l">回饋比例<span class="u">%</span><input id="qk-share" type="number" inputmode="decimal" step="any"></label></div>
 <p id="qk-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p></div>
@@ -173,7 +173,7 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <section id="calc" hidden>
 <div class="card" id="start"><h2>① 選案件</h2>
 <div class="btns" style="margin-bottom:10px"><button class="btn" id="pick-nb" type="button">載入範例：北安段</button><button class="btn ghost" id="pick-mine" type="button" hidden></button></div>
-<div class="grid"><label for="case-pick">或從清單選<select id="case-pick"><option value="">（我的參數）</option><option value="nb">範例｜北安段（雙軌完整範例）</option><option value="g1">G1 新北汐止</option><option value="g2">G2 臺北大安</option><option value="g3">G3 臺北萬華（古蹟）</option><option value="g4">G4 新北永和</option><option value="g5">G5 新北中和（增額）</option><option value="g6">G6 新北中和（TOD）</option><option value="g7">G7 臺中南屯</option><option value="base">舊示範｜江翠段（114 期末考）</option></select></label></div>
+<div class="grid"><label for="case-pick">或從清單選<select id="case-pick"><option value="">（我的參數）</option><option value="nb">範例｜北安段（雙軌完整範例）</option><option value="g1">G1 新北汐止</option><option value="g2">G2 臺北大安（容積代金段）</option><option value="g3">G3 臺北北投</option><option value="g4">G4 新北永和</option><option value="g5">G5 臺北信義（TOD＋增額）</option><option value="g6">G6 臺北大安（TOD 回饋段）</option><option value="g7">G7 新北林口</option><option value="base">舊示範｜江翠段（114 期末考）</option></select></label></div>
 <p id="start-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p>
 <details class="fold" style="margin-top:10px"><summary style="font-size:14px;padding:10px 12px">② 已經有 Excel 計算檔？貼交換碼匯入</summary><div class="in">
 <p style="font-size:12px;color:var(--mut)">在計算範本「B 第二引擎」分頁複製交換碼（ZT1| 開頭的那一格），貼到這裡。</p>
@@ -377,24 +377,24 @@ CASES.nb = { name: '範例：臺北市中山區北安段（審議會版，114.04
 CASES.g1 = { name: "G1 新北市汐止區 住宅大基地案（價格日期 110 年）", city: 'ntpc', landM2: 47846.75, inM2: 40191.27, farLegal: 210, farBef: 315, farAft: 399, legalPark: 0, wLand: 70,
   aft: {floorsUp: 22, floorsDown: 3, digRate: 0, bcr: 50, regArea: 0, resArea: 86624.75, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 2392, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
   bef: {floorsUp: 18, floorsDown: 2, digRate: 0, bcr: 50, regArea: 0, resArea: 68387.96, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 1650, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
-CASES.g2 = { name: "G2 臺北市大安區 SRC 住宅案（容移後／容移前；TOD 回饋獎勵前請另以 Excel 計算）", city: 'tpe', landM2: 3157, inM2: 3314.85, farLegal: 300, farBef: 495, farAft: 599.91, legalPark: 0, wLand: 70,
-  aft: {floorsUp: 22, floorsDown: 5, digRate: 73.93, bcr: 50, regArea: 0, resArea: 8596.85, resPrice: 0, shopArea: 246.78, shopPrice: 0, parkN: 249, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
-  bef: {floorsUp: 18, floorsDown: 4, digRate: 73.93, bcr: 50, regArea: 0, resArea: 7043.5, resPrice: 0, shopArea: 253.84, shopPrice: 0, parkN: 200, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
-CASES.g3 = { name: "G3 臺北市萬華區 古蹟容移案（虛擬比準地，容積率 225% → 315%）", city: 'tpe', landM2: 2677.5, inM2: 2409.75, farLegal: 225, farBef: 225, farAft: 315, legalPark: 0, wLand: 70,
-  aft: {floorsUp: 14, floorsDown: 3, digRate: 70, bcr: 50, regArea: 0, resArea: 3937.81, resPrice: 0, shopArea: 128.38, shopPrice: 0, parkN: 135, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
-  bef: {floorsUp: 10, floorsDown: 2, digRate: 70, bcr: 50, regArea: 0, resArea: 2763.0, resPrice: 0, shopArea: 128.38, shopPrice: 0, parkN: 95, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g2 = { name: "G2 臺北市大安區 SRC 住宅案（容積代金段：容移後／容移前；TOD 獎勵回饋段見 G6）", city: 'tpe', landM2: 3157, inM2: 3314.85, farLegal: 300, farBef: 495, farAft: 599.91, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 22, floorsDown: 5, digRate: 73.925, bcr: 50, regArea: 11433.0, resArea: 8596.79, resPrice: 0, shopArea: 246.79, shopPrice: 0, parkN: 249, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 18, floorsDown: 4, digRate: 73.925, bcr: 50, regArea: 9466.1, resArea: 7043.45, resPrice: 0, shopArea: 253.84, shopPrice: 0, parkN: 200, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g3 = { name: "G3 臺北市北投區 住宅案（容積代金；古蹟容移 10% 不須估價，容移前後都含）", city: 'tpe', landM2: 2454.41, inM2: 1919.91, farLegal: 194.765, farBef: 214.24, farAft: 292.146, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 20, floorsDown: 5, digRate: 51.655, bcr: 40, regArea: 5077.93, resArea: 3506.45, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 135, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 15, floorsDown: 4, digRate: 46.5, bcr: 40, regArea: 3751.98, resArea: 2571.41, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 100, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
 CASES.g4 = { name: "G4 新北市永和區 超高層住宅案", city: 'ntpc', landM2: 4257.54, inM2: 2203.27, farLegal: 345, farBef: 690, farAft: 741.75, legalPark: 0, wLand: 70,
   aft: {floorsUp: 36, floorsDown: 6, digRate: 61.17, bcr: 50, regArea: 18186.3, resArea: 14588.88, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 362, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
   bef: {floorsUp: 34, floorsDown: 6, digRate: 59.03, bcr: 50, regArea: 17154.46, resArea: 13572.78, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 327, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
-CASES.g5 = { name: "G5 新北市中和區 增額容積案", city: 'ntpc', landM2: 2715.28, inM2: 2851.044, farLegal: 300, farBef: 495, farAft: 600, legalPark: 0, wLand: 70,
-  aft: {floorsUp: 24, floorsDown: 6, digRate: 61.83, bcr: 50, regArea: 10117.3, resArea: 7934.04, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 235, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
-  bef: {floorsUp: 20, floorsDown: 5, digRate: 61.83, bcr: 50, regArea: 8441.47, resArea: 6546.66, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 184, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
-CASES.g6 = { name: "G6 新北市中和區 中型 TOD 增額案", city: 'ntpc', landM2: 3830.64, inM2: 1608.87, farLegal: 210, farBef: 315, farAft: 357, legalPark: 0, wLand: 70,
-  aft: {floorsUp: 10, floorsDown: 3, digRate: 0, bcr: 50, regArea: 0, resArea: 6610.62, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 110, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
-  bef: {floorsUp: 8, floorsDown: 3, digRate: 0, bcr: 50, regArea: 0, resArea: 5832.9, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 98, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
-CASES.g7 = { name: "G7 臺中市南屯區 住宅大基地案（224% 方案 vs 168% 容積測試方案）", city: 'tch', landM2: 6124.71, inM2: 3429.84, farLegal: 168, farBef: 168, farAft: 224, legalPark: 0, wLand: 70,
-  aft: {floorsUp: 23, floorsDown: 2, digRate: 70, bcr: 50, regArea: 0, resArea: 6652.89, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 181, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
-  bef: {floorsUp: 18, floorsDown: 2, digRate: 60, bcr: 50, regArea: 0, resArea: 5007.96, resPrice: 0, shopArea: 0, shopPrice: 0, parkN: 140, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g5 = { name: "G5 臺北市信義區 商住大樓案（增額後／增額前；TOD 獎勵 21.8197%＋增額容積 20%）", city: 'tpe', landM2: 3813, inM2: 5846.4, farLegal: 366.64, farBef: 566.04, farAft: 719.36, legalPark: 0, wLand: 70, feeName: '增額容積價金＋TOD 獎勵容積回饋代金', full: 1,
+  aft: {floorsUp: 37, floorsDown: 6, digRate: 66.93, bcr: 40, regArea: 15491.12, resArea: 11396.03, resPrice: 0, shopArea: 1294.6, shopPrice: 0, parkN: 262, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 29, floorsDown: 5, digRate: 66.93, bcr: 40, regArea: 12235.0, resArea: 8685.56, resPrice: 0, shopArea: 1305.44, shopPrice: 0, parkN: 204, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g6 = { name: "G6 臺北市大安區 SRC 住宅案（TOD 獎勵回饋段：回饋獎勵後／回饋獎勵前，與 G2 同一基地）", city: 'tpe', landM2: 3157, inM2: 229.1, farLegal: 300, farBef: 592.74, farAft: 599.91, legalPark: 0, wLand: 70, feeName: 'TOD 獎勵容積回饋代金', full: 1,
+  aft: {floorsUp: 22, floorsDown: 5, digRate: 73.925, bcr: 50, regArea: 11433.0, resArea: 8596.79, resPrice: 0, shopArea: 246.79, shopPrice: 0, parkN: 249, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 22, floorsDown: 5, digRate: 73.017, bcr: 50, regArea: 11314.0, resArea: 8492.32, resPrice: 0, shopArea: 246.1, shopPrice: 0, parkN: 246, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
+CASES.g7 = { name: "G7 新北市林口區 店住大樓案（價格日期 115 年 3 月）", city: 'ntpc', landM2: 1631.75, inM2: 978.8, farLegal: 150, farBef: 165, farAft: 225, legalPark: 0, wLand: 70,
+  aft: {floorsUp: 12, floorsDown: 3, digRate: 60, bcr: 50, regArea: 2455.38, resArea: 1428.4, resPrice: 0, shopArea: 368.52, shopPrice: 0, parkN: 64, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0},
+  bef: {floorsUp: 9, floorsDown: 2, digRate: 60, bcr: 50, regArea: 1757.13, resArea: 935.84, resPrice: 0, shopArea: 381.73, shopPrice: 0, parkN: 41, parkPrice: 0, cost: 0, design: 0, adv: 0, mgmt: 0, tax: 0, years: 0, R: 0, i: 0, cmp: 0} };
 
 CASES.flaw1 = (() => { const c = clone(CASES.base); c.name = '待審案 A（臺北市，模擬）'; c.city = 'tpe';
   c.bef.floorsDown = 4; c.bef.digRate = 52; c.bef.R = 17; c.bef.adv = 5; c.bef.resPrice = 620000; c.legalPark = 40; return c; })();
@@ -657,9 +657,9 @@ function qkFrom(c) {
   const lp = c.landM2 * PING, legal = c.farLegal > 0 ? c.farLegal : c.farBef, sc = s => { const sell = s.resArea + (s.shopArea || 0);
     return { parkArea: s.regArea > 0 && s.parkN > 0 ? r2((s.regArea - sell) / s.parkN) : 8.5, price: sell > 0 && s.resPrice > 0 ? r2((s.resArea * s.resPrice + (s.shopArea || 0) * (s.shopPrice || 0)) / sell / 1e4) : 0, parkN: s.parkN, parkPrice: r2(s.parkPrice / 1e4), cost: r2(s.cost / 1e4), R: s.R, i: s.i }; };
   const sellA = c.aft.resArea + (c.aft.shopArea || 0);
-  return { name: c.name, landM2: c.landM2, farLegal: legal, bonus: r2((c.farBef / legal - 1) * 100), add: r2((c.farAft - c.farBef) / legal * 100),
+  return { name: c.name, landM2: c.landM2, farLegal: legal, bonus: Math.round((c.farBef / legal - 1) * 1e6) / 1e4, add: Math.round((c.farAft - c.farBef) / legal * 1e6) / 1e4,
     ratio: Math.round(sellA / (lp * c.farAft / 100) * 1e4) / 1e4,
-    sens: Object.assign({ city: c.city === 'ntpc' ? 'ntpc' : 'tpe', fb: c.bef.floorsUp || 20, bb: c.bef.floorsDown || 4, yb: c.bef.years || 4 }, QS_DEF[c.city === 'ntpc' ? 'ntpc' : 'tpe']), ind: (c.aft.adv + c.aft.mgmt + c.aft.tax) || 9, des: c.aft.design || 0, fin: 1.63, share: 100, mode: 'fee', aft: sc(c.aft), bef: sc(c.bef) };
+    sens: Object.assign({ city: c.city === 'ntpc' ? 'ntpc' : 'tpe', fb: c.bef.floorsUp || 20, bb: c.bef.floorsDown || 4, yb: c.bef.years || 4 }, QS_DEF[c.city === 'ntpc' ? 'ntpc' : 'tpe']), ind: (c.aft.adv + c.aft.mgmt + c.aft.tax) || 9, des: c.aft.design || 0, fin: 1.63, share: 100, mode: 'fee', feeName: c.feeName || '', full: c.full || 0, aft: sc(c.aft), bef: sc(c.bef) };
 }
 function qkScen(q, s, far) {
   const lp = q.landM2 * PING, vol = lp * far / 100, sell = vol * q.ratio;
@@ -685,7 +685,7 @@ function qkBuild() {
   $('#qk-mode').onchange = e => { const m = e.target.value; qk.mode = m; if (m !== 'x') qk.share = m === 'fee' ? 100 : 50; qkSave(); qkFill(); qkRender(); };
   $('#qk-pick').onchange = e => { const k = e.target.value; if (!k) return;
     qk = k === 'tod' ? clone(QK_TOD) : k === 'e802' ? clone(QK_802) : k === 'fy' ? clone(QK_FY) : qkFrom(k === 'cur' ? state : CASES[k]); qk.key = k === 'cur' ? '' : k; qkSave(); qkFill(); qkRender();
-    $('#qk-msg').textContent = '已帶入：' + qk.name + (qk.aft.price > 0 ? '' : (qk.ratio > 0 ? '。量體已填好，請補上價格、成本與報酬。' : '。容積已填好，請自行判斷銷坪比、價格、成本與報酬。')); };
+    $('#qk-msg').textContent = '已帶入：' + qk.name + (qk.aft.price > 0 ? '' : (qk.ratio > 0 ? '。量體已填好，請補上價格、成本與報酬。' : '。容積已填好，請自行判斷銷坪比、價格、成本與報酬。')) + (qk.full ? '本案為臺北市增額容積價金、TOD 獎勵容積回饋代金，以土地價差全額計算，金額性質請維持 100%，不要改選 50%。量體若與個案資料包不同，以資料包為準。' : ''); };
 }
 /* 移入量對照：以容移前為基準，依移入量推估容移後樓層、工期，再查表帶出造價、利潤率差異。QS_COST 為第四號公報（113 年 12 月適用，物價基期 113 年 11 月）鋼筋混凝土造住宅、辦公室標準表，單位千元/坪。 */
 const QS_ROWS = [3, 5, 8, 10, 13, 15, 18, 20, 25, 30, 35, 40], QS_STDB = [0, 0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4], QS_BADD = [0.3, 0.4, 0.5, 0.6];
@@ -786,7 +786,7 @@ function qkRender() {
   $('#qk-vol').textContent = q.landM2 > 0 ? `允建容積率：容移前 ${nf(farB, 2)}% → 容移後 ${nf(farA, 2)}%；基地 ${nf(q.landM2 * PING, 2)} 坪；增加容積 ${nf(q.landM2 * PING * q.farLegal * q.add / 1e4, 2)} 坪` : '';
   $('#qk-todo').hidden = ready;
   if (!ready) { $('#qk-todo').innerHTML = '<b>還差幾格</b>' + (q.ratio > 0 ? '' : '先填銷坪比。') + '量體之外，請填容移後與容移前的房屋均價、營造單價，以及利潤率、利率。填齊就會出數字。'; $('#qk-kpi').innerHTML = ''; $('#qk-gap').innerHTML = ''; $('#qk-tor').innerHTML = ''; $('#qk-steps').innerHTML = ''; $('#qk-cmp').textContent = ''; return; }
-  const r = qkCalc(q), A = q.aft, B = q.bef, label = q.mode === 'fee' ? '容積代金（快算）' : `回饋金額（土地價差×${q.share}%）`;
+  const r = qkCalc(q), A = q.aft, B = q.bef, label = q.mode === 'fee' ? (q.feeName || '容積代金') + '（快算）' : `回饋金額（土地價差×${q.share}%）`;
   $('#qk-kpi').innerHTML = (r.is802 ? [
     [`80 條之 2 回饋價值（淨利益×${q.share}%）`, wan(r.fee), `淨利益 ${wan(r.net)}＝總銷增加 ${wan(r.dS)} − 成本增加 ${wan(r.dC802)}`],
     ['回饋樓地板面積', nf(r.backPing, 1) + '<small> 坪</small>', `回饋價值÷放寬後均價 ${nf(A.price, 1)} 萬/坪`],
