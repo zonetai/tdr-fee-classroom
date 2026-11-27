@@ -205,10 +205,11 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <section id="ai" hidden>
 <div class="card"><h2>用目前案件資料問 AI</h2><p id="ai-note" style="font-size:13px;color:var(--mut)">此頁會把目前參數與檢核結果組成提示詞。</p>
 <div class="btns" style="margin:10px 0"><button class="btn" data-ai="grill">模擬委員質詢我</button><button class="btn ghost" data-ai="explain">解釋未通過項目</button><button class="btn ghost" data-ai="memo">草擬審查意見</button></div>
-<div id="ai-out" class="hint">選一個模式開始。</div></div>
+<div id="ai-out" class="hint">選一個模式開始。</div>
+<div id="ai-chat" hidden style="margin-top:10px"><label for="ai-reply">回覆助教或繼續追問<textarea id="ai-reply" style="min-height:70px;font-size:14px"></textarea></label><div class="btns" style="margin-top:8px"><button class="btn" id="ai-send">送出</button><button class="btn ghost" id="ai-reset">重新開始</button></div></div></div>
 <div class="card"><h2>提示詞</h2><textarea id="ai-prompt" aria-label="提示詞" readonly></textarea><div class="btns" style="margin-top:8px"><button class="btn ghost" id="ai-copy">複製提示詞</button></div>
 <h4>AI 使用紀錄</h4><label for="ai-ans">AI 的回答（貼上）<textarea id="ai-ans"></textarea></label><label for="ai-fix" style="margin-top:8px">我查證後的修正（AI 哪裡說錯、依據是什麼）<textarea id="ai-fix" style="min-height:80px"></textarea></label><div class="btns" style="margin-top:8px"><button class="btn" id="ai-save">存入使用紀錄</button></div><p id="ai-save-msg" style="font-size:12px;color:var(--mut);margin:6px 0"></p>
-<p class="hint"><b>使用規則</b>AI 的回答可能引用舊版或別的縣市的規定。報告須附「AI 使用紀錄」：問了什麼、AI 答了什麼、你查證後修正了什麼。抓到 AI 的錯誤可加分。</p></div>
+<p class="hint"><b>使用規則</b>AI 的回答可能引用舊版或別的縣市的規定。送出的內容會傳到事務所的 AI 服務，請勿輸入個人資料。報告須附「AI 使用紀錄」：問了什麼、AI 答了什麼、你查證後修正了什麼。抓到 AI 的錯誤可加分。</p></div>
 </section>
 </main>
 <footer>教學用工具，檢核門檻依課程講義整理，非審議依據。實際案件以主管機關現行範本及審議決議為準。</footer>
@@ -606,8 +607,19 @@ function buildPrompt(mode) { const { r, checks } = check(state), R = RULES[state
     explain: '請逐項解釋上列未通過的檢核項目背後的估價邏輯，說明為何雙情境比較需要這項一致性，並各舉一個反例。請標示你引用的規定出處與版本年度，不確定者請明講。',
     memo: '請以審查委員口吻，就上列資料草擬 5 點審查意見，每點含「問題、依據、請補正事項」。請標示規定出處與版本年度，不確定者請明講。' }[mode];
   return `${data}\n\n${ask}\n\n限制：臺北市與新北市規定不同且逐年修訂，請勿把一市的規定套到另一市。`; }
-let sampler = null, lastAiMode = 'grill';
+/* AI 助教端點：Supabase Edge Function（supabase/functions/tdr-tutor），金鑰只存在伺服器端。留空則只提供「複製提示詞」。 */
+const AI = { endpoint: 'https://snyjmzwrgtupbutoppqf.supabase.co/functions/v1/tdr-tutor' };
+let sampler = null, lastAiMode = 'grill', aiChat = [], aiBusy = false;
+const aiShow = extra => { const t = aiChat.slice(1).map(m => (m.role === 'user' ? '我：' : '助教：') + m.content).join('\n\n'); $('#ai-out').textContent = t + (extra ? (t ? '\n\n' : '') + extra : ''); $('#ai-chat').hidden = !aiChat.length; };
+async function aiAsk() { if (aiBusy) return; aiBusy = true; aiShow('助教思考中，約需十幾秒…');
+  try { const r = await fetch(AI.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sid: who.sid, grp: who.grp || null, mode: lastAiMode, messages: aiChat }) }).catch(() => { throw new Error('無法連線到 AI 助教（離線版或網路不通）'); });
+    const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'HTTP ' + r.status);
+    aiChat.push({ role: 'assistant', content: d.text }); aiShow(d.truncated ? '（回覆過長被截斷，可請助教繼續）' : ''); $('#ai-ans').value = aiChat.slice(1).map(m => (m.role === 'user' ? '我：' : 'AI：') + m.content).join('\n\n'); }
+  catch (e) { const last = aiChat.pop(); if (aiChat.length && last) $('#ai-reply').value = last.content; aiShow('沒有成功：' + e.message + '。也可以按「複製提示詞」貼到你慣用的 AI 工具。'); }
+  aiBusy = false; }
+function aiSend() { const t = $('#ai-reply').value.trim(); if (!t || aiBusy || !aiChat.length) return; if (aiChat.length >= 23) { aiShow('這一輪對話已經很長，請按「重新開始」。'); return; } aiChat.push({ role: 'user', content: t.slice(0, 4000) }); $('#ai-reply').value = ''; aiAsk(); }
 async function runAI(mode) { lastAiMode = mode; const p = buildPrompt(mode), out = $('#ai-out'); $('#ai-prompt').value = p;
+  if (!sampler && AI.endpoint) { if (aiBusy) return; if (!/^[0-9A-Za-z]{6,12}$/.test(who.sid)) { aiChat = []; aiShow(''); out.textContent = '請先到首頁輸入學號，才能直接問 AI 助教。也可以按「複製提示詞」貼到你慣用的 AI 工具。'; return; } aiChat = [{ role: 'user', content: p }]; return aiAsk(); }
   if (!sampler) { out.textContent = '請按「複製提示詞」，貼到你慣用的 AI 工具，再把回答貼回下方存入使用紀錄。'; return; }
   out.textContent = '思考中…';
   try { const res = await sampler(p, { onText: ({ text }) => out.textContent = text }); out.textContent = res.text; }
@@ -629,6 +641,8 @@ function init() {
   $$('[data-review]').forEach(b => b.onclick = () => startReview(b.dataset.review));
   $('#rv-grade').onclick = gradeReview;
   $$('[data-ai]').forEach(b => b.onclick = () => runAI(b.dataset.ai));
+  $('#ai-send').onclick = aiSend; $('#ai-reset').onclick = () => { if (aiBusy) return; aiChat = []; aiShow(''); $('#ai-out').textContent = '選一個模式開始。'; };
+  if (AI.endpoint) { $('#ai-note').textContent = '此頁會把目前參數與檢核結果送給 AI 助教（事務所提供的模型），可直接在此頁對話。每個學號每小時 20 次。'; $('label[for="ai-ans"]').firstChild.textContent = 'AI 的回答（直接對話時自動帶入，也可自行貼上）'; }
   $('#ai-copy').onclick = async () => { const t = $('#ai-prompt'); if (!t.value) t.value = buildPrompt('grill'); try { await navigator.clipboard.writeText(t.value); $('#ai-copy').textContent = '已複製'; } catch (e) { t.select(); $('#ai-copy').textContent = '請長按全選複製'; } };
   renderLearn(); fillForm(); render(); renderQuiz(); renderHome();
   $$('#home [data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
