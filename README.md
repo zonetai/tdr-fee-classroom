@@ -10,3 +10,11 @@
 學生端只能新增，不能讀取他人紀錄。學號未經驗證，可能被冒填，成績採計前請與繳交資料交叉核對。
 
 教學用工具，檢核門檻非審議依據。
+
+## AI 助教
+
+「AI 助教」分頁直接呼叫 Supabase Edge Function `tdr-tutor`（原始碼在 `supabase/functions/tdr-tutor/index.ts`，做法比照 zonetai/appraiser-exam-platform 的 `grade`）。函式部署在與該平台相同的 Supabase 專案，沿用其 `ANTHROPIC_API_KEY`，金鑰不進前端。端點網址寫在 `index.html` 的 `const AI = { endpoint }`，留空則只提供「複製提示詞」。
+
+- 只接受 `https://zonetai.github.io` 來源；需學號（6 至 12 碼英數字）。
+- 限流：每學號每小時 20 次、每 IP 300 次、全站 600 次（可用 `TUTOR_HOURLY_PER_STUDENT`、`TUTOR_HOURLY_PER_IP`、`TUTOR_HOURLY_TOTAL` 調整），模型可用 `TUTOR_MODEL` 指定。限流只在同一執行個體內有效，請另在 Anthropic Console 設定每月用量上限。
+- 函式不儲存對話；學生按「存入使用紀錄」才會寫入 `ai_logs`。
