@@ -18,3 +18,11 @@
 - 只接受 `https://zonetai.github.io` 來源；需學號（6 至 12 碼英數字）。
 - 限流：每學號每小時 20 次、每 IP 300 次、全站 600 次（可用 `TUTOR_HOURLY_PER_STUDENT`、`TUTOR_HOURLY_PER_IP`、`TUTOR_HOURLY_TOTAL` 調整），模型可用 `TUTOR_MODEL` 指定。限流只在同一執行個體內有效，請另在 Anthropic Console 設定每月用量上限。
 - 函式不儲存對話；學生按「存入使用紀錄」才會寫入 `ai_logs`。
+
+## 教師頁
+
+網址後綴 `#teacher`（頁尾也有入口）。輸入教師密碼後，讀取全班的測驗、審查演練、AI 使用紀錄與各組參數，顯示各組總覽、學生明細、各題答對率，並可匯出 CSV。
+
+啟用方式：在 Supabase 的 SQL Editor 執行一次 `teacher.sql`，執行前把檔案裡「請改成您的教師密碼」改成自己的密碼（至少 10 個字）。資料庫只存密碼雜湊，密碼不寫進網頁或 repo；學生端的 anon key 仍然讀不到任何資料。
+
+AI 助教的每一輪對話會自動寫入 `ai_logs`（模式欄標示「自動」），學生另外按「存入使用紀錄」的整段紀錄與修正也在同一張表。
