@@ -150,7 +150,7 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <section id="quick" hidden>
 <div class="card"><h2>快算：十幾格抓出代金量級</h2>
 <p class="sub">把雙情境土開法縮成一頁。量體用「容積率×銷坪比」推，容移前只填和容移後<b>不一樣</b>的地方。適合開案前抓量級、審查時反推對方數字。正式估價仍以「試算檢核」與 Excel 為準。</p>
-<div class="grid" style="margin-top:10px"><label for="qk-pick">帶入案件<select id="qk-pick"><option value="">（我的參數）</option><option value="tod">範例｜土地價差 × 50% 案（模擬，事務所速算表算法）</option><option value="e802">範例｜80 條之 2 放寬案（模擬，淨利益 50%）</option><option value="nb">範例｜北安段（完整參數）</option><option value="fy">富宇案（簡報競標題，只有量體）</option><option value="g1">G1 新北汐止（只有量體）</option><option value="g2">G2 臺北大安 容積代金段（只有量體）</option><option value="g3">G3 臺北北投（只有量體）</option><option value="g4">G4 新北永和（只有量體）</option><option value="g5">G5 臺北信義 TOD＋增額（只有量體）</option><option value="g6">G6 臺北大安 TOD 回饋段（只有量體）</option><option value="g7">G7 新北林口（只有量體）</option><option value="cur">從「試算檢核」目前的參數帶入</option></select></label>
+<div class="grid" style="margin-top:10px"><label for="qk-pick">帶入案件<select id="qk-pick"><option value="">（我的參數）</option><option value="tod">範例｜土地價差 × 50% 案（模擬，事務所速算表算法）</option><option value="e802">範例｜80 條之 2 放寬案（模擬，淨利益 50%）</option><option value="nb">範例｜北安段（完整參數）</option><option value="g1">G1 新北汐止（只有量體）</option><option value="g2">G2 臺北大安 容積代金段（只有量體）</option><option value="g3">G3 臺北北投（只有量體）</option><option value="g4">G4 新北永和（只有量體）</option><option value="g5">G5 臺北信義 TOD＋增額（只有量體）</option><option value="g6">G6 臺北大安 TOD 回饋段（只有量體）</option><option value="g7">G7 新北林口（只有量體）</option><option value="cur">從「試算檢核」目前的參數帶入</option></select></label>
 <label for="qk-mode">金額性質<select id="qk-mode"><option value="fee">容積代金（土地價差 100%）</option><option value="tod">土地價差 × 50%（事務所速算表算法；雙北 TOD 增額價金為全額，不適用）</option><option value="802">80 條之 2 回饋（淨利益 × 50%）</option><option value="x">自訂比例（土地價差）</option></select></label>
 <label for="qk-share" id="qk-share-l">回饋比例<span class="u">%</span><input id="qk-share" type="number" inputmode="decimal" step="any"></label></div>
 <p id="qk-msg" style="font-size:12px;color:var(--mut);margin-top:6px"></p>
@@ -645,9 +645,6 @@ const QK_802 = { name: '範例：80 條之 2 放寬案（模擬）', mode: '802'
   aft: { price: 150, parkN: 340, parkPrice: 400, parkArea: 8.5, cost: 36.5, R: 16, i: 7.5 }, bef: { price: 147, parkN: 295, parkPrice: 400, parkArea: 8.5, cost: 34.3, R: 15, i: 7.05 } };
 const QK_TOD = { name: '範例：土地價差 × 50%（模擬，事務所速算表算法；新北 TOD 增額容積價金依許可要點第四點為價差全額，臺北 TOD 回饋代金與增額價金也是全額）', mode: 'tod', fin: 1.63, landM2: 5000, farLegal: 225, bonus: 70, add: 30, ratio: 1.58, ind: 9, des: 0, share: 50,
   aft: { price: 150, parkN: 340, parkPrice: 400, parkArea: 8.5, cost: 32, R: 16, i: 7.5 }, bef: { price: 146.7, parkN: 295, parkPrice: 400, parkArea: 8.5, cost: 30, R: 15, i: 7.05 } };
-/* 富宇案：只帶量體。容移前＝基準容積＋大稻埕容移，容移後再加代金移入 40%；基地面積為約數。價格與成本由同學自行判斷，不預填。 */
-const QK_FY = { name: '富宇案（容移前＝基準 300%＋大稻埕 0.11%；容移後再加移入 40%）', mode: 'fee', fin: 1.63, landM2: 5372.9, farLegal: 300, bonus: 0.11, add: 40, ratio: null, ind: null, des: null, share: 100,
-  aft: { price: 0, parkN: 0, parkPrice: 0, parkArea: 0, cost: 0, R: 0, i: 0 }, bef: { price: 0, parkN: 0, parkPrice: 0, parkArea: 0, cost: 0, R: 0, i: 0 } };
 let qk = clone(QK_TOD);
 try { const s = localStorage.getItem('tdr_quick'); if (s) qk = JSON.parse(s); } catch (e) {}
 if (!qk.mode) qk.mode = qk.custom ? 'x' : qk.share === 100 ? 'fee' : qk.share === 50 ? 'tod' : 'x'; if (qk.fin == null) qk.fin = 1.63;
@@ -685,7 +682,7 @@ function qkBuild() {
   $('#qk-share').addEventListener('input', e => { const v = parseFloat(e.target.value); if (isNaN(v)) return; qk.share = v; qkSave(); qkRender(); });
   $('#qk-mode').onchange = e => { const m = e.target.value; qk.mode = m; if (m !== 'x') qk.share = m === 'fee' ? 100 : 50; qkSave(); qkFill(); qkRender(); };
   $('#qk-pick').onchange = e => { const k = e.target.value; if (!k) return;
-    qk = k === 'tod' ? clone(QK_TOD) : k === 'e802' ? clone(QK_802) : k === 'fy' ? clone(QK_FY) : qkFrom(k === 'cur' ? state : CASES[k]); qk.key = k === 'cur' ? '' : k; qkSave(); qkFill(); qkRender();
+    qk = k === 'tod' ? clone(QK_TOD) : k === 'e802' ? clone(QK_802) : qkFrom(k === 'cur' ? state : CASES[k]); qk.key = k === 'cur' ? '' : k; qkSave(); qkFill(); qkRender();
     $('#qk-msg').textContent = '已帶入：' + qk.name + (qk.aft.price > 0 ? '' : (qk.ratio > 0 ? '。量體已填好，請補上價格、成本與報酬。' : '。容積已填好，請自行判斷銷坪比、價格、成本與報酬。')) + (qk.full ? '本案為臺北市增額容積價金、TOD 獎勵容積回饋代金，以土地價差全額計算，金額性質請維持 100%，不要改選 50%。量體若與個案資料包不同，以資料包為準。' : '') + (k === 'tod' ? '提醒：新北市審查大眾運輸發展導向增額容積申請案件許可要點（115 年 5 月 14 日修正）第四點，增額容積價金＝含增額容積之基地價格－未含之基地價格，是全額；第十一點的百分之五十是價金繳入基金的分配，不是回饋比例。' : ''); };
 }
 /* 移入量對照：以容移前為基準，依移入量推估容移後樓層、工期，再查表帶出造價、利潤率差異。QS_COST 為第四號公報（113 年 12 月適用，物價基期 113 年 11 月）鋼筋混凝土造住宅、辦公室標準表，單位千元/坪。 */
