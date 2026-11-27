@@ -211,8 +211,20 @@ details[open].lesson>summary:after,details[open].fold>summary:after{content:"－
 <h4>AI 使用紀錄</h4><label for="ai-ans">AI 的回答（貼上）<textarea id="ai-ans"></textarea></label><label for="ai-fix" style="margin-top:8px">我查證後的修正（AI 哪裡說錯、依據是什麼）<textarea id="ai-fix" style="min-height:80px"></textarea></label><div class="btns" style="margin-top:8px"><button class="btn" id="ai-save">存入使用紀錄</button></div><p id="ai-save-msg" style="font-size:12px;color:var(--mut);margin:6px 0"></p>
 <p class="hint"><b>使用規則</b>AI 的回答可能引用舊版或別的縣市的規定。送出的內容會傳到事務所的 AI 服務，請勿輸入個人資料。報告須附「AI 使用紀錄」：問了什麼、AI 答了什麼、你查證後修正了什麼。抓到 AI 的錯誤可加分。</p></div>
 </section>
+<section id="teacher" hidden>
+<div class="card"><h2>教師頁</h2><p style="font-size:13px;color:var(--mut)">輸入教師密碼後，讀取全班的測驗、審查演練、AI 使用紀錄與各組儲存的參數。密碼只留在這個分頁的記憶體，關掉就沒有了。</p>
+<div class="grid"><label for="tc-pass">教師密碼<input id="tc-pass" type="password" autocomplete="off"></label></div>
+<div class="btns" style="margin-top:10px"><button class="btn" id="tc-load">讀取資料</button></div><p id="tc-msg" style="font-size:13px;color:var(--mut);margin:8px 0 0"></p></div>
+<div id="tc-body" hidden>
+<div class="card"><h2>各組總覽</h2><div class="scroll"><table id="tc-groups"></table></div></div>
+<div class="card"><h2>學生明細</h2><p style="font-size:12px;color:var(--mut)">學號沒有驗證，可能被冒填，採計前請與繳交資料核對。</p><div class="scroll"><table id="tc-students"></table></div></div>
+<div class="card"><h2>判斷題各題答對率</h2><p style="font-size:12px;color:var(--mut)">以每位學生第一次作答計算。</p><div class="scroll"><table id="tc-quiz"></table></div></div>
+<div class="card"><h2>最近的 AI 使用紀錄</h2><div id="tc-ai"></div></div>
+<div class="card"><h2>匯出</h2><p style="font-size:13px;color:var(--mut)">CSV 可直接用 Excel 開啟。</p><div class="btns"><button class="btn ghost" data-csv="students">學生明細</button><button class="btn ghost" data-csv="quiz">測驗作答</button><button class="btn ghost" data-csv="review">審查演練</button><button class="btn ghost" data-csv="ai">AI 使用紀錄</button><button class="btn ghost" data-csv="cases">各組參數</button></div></div>
+</div>
+</section>
 </main>
-<footer>教學用工具，檢核門檻依課程講義整理，非審議依據。實際案件以主管機關現行範本及審議決議為準。</footer>
+<footer>教學用工具，檢核門檻依課程講義整理，非審議依據。實際案件以主管機關現行範本及審議決議為準。 <a href="#teacher" id="tc-link" style="color:inherit">教師頁</a></footer>
 <script>
 /* 容積代金雙情境計算與檢核引擎。規則庫 RULES 與計算分離，換縣市或年度版本只改 RULES。 */
 const PING = 0.3025;
@@ -614,7 +626,7 @@ const aiShow = extra => { const t = aiChat.slice(1).map(m => (m.role === 'user' 
 async function aiAsk() { if (aiBusy) return; aiBusy = true; aiShow('助教思考中，約需十幾秒…');
   try { const r = await fetch(AI.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sid: who.sid, grp: who.grp || null, mode: lastAiMode, messages: aiChat }) }).catch(() => { throw new Error('無法連線到 AI 助教（離線版或網路不通）'); });
     const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'HTTP ' + r.status);
-    aiChat.push({ role: 'assistant', content: d.text }); aiShow(d.truncated ? '（回覆過長被截斷，可請助教繼續）' : ''); $('#ai-ans').value = aiChat.slice(1).map(m => (m.role === 'user' ? '我：' : 'AI：') + m.content).join('\n\n'); }
+    logRow('ai_logs', { mode: lastAiMode + '（自動）', prompt: aiChat[aiChat.length - 1].content.slice(0, 8000), ai_answer: String(d.text).slice(0, 19000), correction: null }); aiChat.push({ role: 'assistant', content: d.text }); aiShow(d.truncated ? '（回覆過長被截斷，可請助教繼續）' : ''); $('#ai-ans').value = aiChat.slice(1).map(m => (m.role === 'user' ? '我：' : 'AI：') + m.content).join('\n\n'); }
   catch (e) { const last = aiChat.pop(); if (aiChat.length && last) $('#ai-reply').value = last.content; aiShow('沒有成功：' + e.message + '。也可以按「複製提示詞」貼到你慣用的 AI 工具。'); }
   aiBusy = false; }
 function aiSend() { const t = $('#ai-reply').value.trim(); if (!t || aiBusy || !aiChat.length) return; if (aiChat.length >= 23) { aiShow('這一輪對話已經很長，請按「重新開始」。'); return; } aiChat.push({ role: 'user', content: t.slice(0, 4000) }); $('#ai-reply').value = ''; aiAsk(); }
@@ -625,7 +637,7 @@ async function runAI(mode) { lastAiMode = mode; const p = buildPrompt(mode), out
   try { const res = await sampler(p, { onText: ({ text }) => out.textContent = text }); out.textContent = res.text; }
   catch (e) { out.textContent = '呼叫失敗（' + (e.code || '未知') + '）。請改用「複製提示詞」。'; } }
 
-const TABS = ['home', 'learn', 'quiz', 'quick', 'calc', 'sens', 'review', 'ai'];
+const TABS = ['home', 'learn', 'quiz', 'quick', 'calc', 'sens', 'review', 'ai', 'teacher'];
 function go(t) { if (t === 'rules') t = 'learn'; if (!TABS.includes(t)) t = 'home'; $$('.tab').forEach(b => { const on = b.dataset.t === t; b.setAttribute('aria-selected', on); if (on && b.scrollIntoView) b.scrollIntoView({ inline: 'center', block: 'nearest' }); }); $$('main > section').forEach(s => s.hidden = s.id !== t); try { history.replaceState(null, '', location.pathname + location.search + '#' + t); } catch (e) {} window.scrollTo(0, 0); }
 
 function fillRules() { const el = $('#rules-body'); if (!el) return;
@@ -642,7 +654,7 @@ function init() {
   $('#rv-grade').onclick = gradeReview;
   $$('[data-ai]').forEach(b => b.onclick = () => runAI(b.dataset.ai));
   $('#ai-send').onclick = aiSend; $('#ai-reset').onclick = () => { if (aiBusy) return; aiChat = []; aiShow(''); $('#ai-out').textContent = '選一個模式開始。'; };
-  if (AI.endpoint) { $('#ai-note').textContent = '此頁會把目前參數與檢核結果送給 AI 助教（事務所提供的模型），可直接在此頁對話。每個學號每小時 20 次。'; $('label[for="ai-ans"]').firstChild.textContent = 'AI 的回答（直接對話時自動帶入，也可自行貼上）'; }
+  if (AI.endpoint) { $('#ai-note').textContent = '此頁會把目前參數與檢核結果送給 AI 助教（事務所提供的模型），可直接在此頁對話，對話內容會自動留存供老師檢視。每個學號每小時 20 次。'; $('label[for="ai-ans"]').firstChild.textContent = 'AI 的回答（直接對話時自動帶入，也可自行貼上；查證後的修正請填在下一格再存）'; }
   $('#ai-copy').onclick = async () => { const t = $('#ai-prompt'); if (!t.value) t.value = buildPrompt('grill'); try { await navigator.clipboard.writeText(t.value); $('#ai-copy').textContent = '已複製'; } catch (e) { t.select(); $('#ai-copy').textContent = '請長按全選複製'; } };
   renderLearn(); fillForm(); render(); renderQuiz(); renderHome();
   $$('#home [data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
@@ -875,6 +887,41 @@ async function sb(path, body) {
   return r.status === 204 || r.headers.get('content-length') === '0' ? null : r.json().catch(() => null);
 }
 function logRow(table, row) { if (!cloudOn()) return; sb(table, Object.assign({ student_id: who.sid, group_code: who.grp || null }, row)).catch(e => setMsg('紀錄未送出：' + e.message)); }
+/* 教師頁：憑教師密碼呼叫資料庫函式 teacher_data（見 teacher.sql）。密碼不存檔。 */
+let tcData = null;
+const escH = x => String(x ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const tcTime = t => t ? new Date(t).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+function tcStudents(d) { const m = new Map(), get = (r) => { const k = r.student_id; if (!m.has(k)) m.set(k, { sid: k, grp: '', first: new Map(), runs: 0, hit: 0, miss: 0, fa: 0, ai: 0, fix: 0, last: '' }); const o = m.get(k); if (r.group_code) o.grp = o.grp || r.group_code; if (r.created_at > o.last) o.last = r.created_at; return o; };
+  [...d.quiz].sort((a, b) => a.created_at < b.created_at ? -1 : 1).forEach(r => { const o = get(r); if (!o.first.has(r.q_index)) o.first.set(r.q_index, r.correct); });
+  d.review.forEach(r => { const o = get(r); o.runs++; o.hit += r.hit || 0; o.miss += r.miss || 0; o.fa += r.false_alarm || 0; });
+  d.ai.forEach(r => { const o = get(r); o.ai++; if (r.correction) o.fix++; });
+  return [...m.values()].map(o => ({ sid: o.sid, grp: o.grp, answered: o.first.size, right: [...o.first.values()].filter(Boolean).length, runs: o.runs, hit: o.hit, miss: o.miss, fa: o.fa, ai: o.ai, fix: o.fix, last: o.last })).sort((a, b) => (a.grp || '~').localeCompare(b.grp || '~') || a.sid.localeCompare(b.sid)); }
+function tcRender() { const d = tcData, st = tcStudents(d), pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '';
+  const gs = [...new Set(st.map(x => x.grp || '未填組別'))].sort();
+  $('#tc-groups').innerHTML = '<tr><th>組別</th><td>學生數</td><td>測驗首答題數</td><td>首答答對率</td><td>審查演練次數</td><td>AI 紀錄</td><td>有填修正</td><td>組參數最後儲存</td></tr>' + gs.map(g => { const a = st.filter(x => (x.grp || '未填組別') === g), sum = k => a.reduce((t, x) => t + x[k], 0), c = d.cases.find(x => x.group_code === g);
+    return `<tr><th>${escH(g)}</th><td>${a.length}</td><td>${sum('answered')}</td><td>${pct(sum('right'), sum('answered'))}</td><td>${sum('runs')}</td><td>${sum('ai')}</td><td>${sum('fix')}</td><td>${c ? tcTime(c.updated_at) + '（' + escH(c.updated_by || '') + '）' : '未儲存'}</td></tr>`; }).join('');
+  $('#tc-students').innerHTML = `<tr><th>學號</th><td>組別</td><td>測驗已答（共 ${QUIZ.length} 題）</td><td>首答答對</td><td>審查演練次數</td><td>抓到／漏掉／誤判</td><td>AI 紀錄</td><td>有填修正</td><td>最後活動</td></tr>` + (st.map(x => `<tr><th>${escH(x.sid)}</th><td>${escH(x.grp)}</td><td>${x.answered}</td><td>${x.right}</td><td>${x.runs}</td><td>${x.runs ? x.hit + '／' + x.miss + '／' + x.fa : ''}</td><td>${x.ai}</td><td>${x.fix}</td><td>${tcTime(x.last)}</td></tr>`).join('') || '<tr><th>尚無紀錄</th></tr>');
+  const q = new Map(), seen = new Set(); [...d.quiz].sort((a, b) => a.created_at < b.created_at ? -1 : 1).forEach(r => { const k = r.student_id + '|' + r.q_index; if (seen.has(k)) return; seen.add(k); const o = q.get(r.q_index) || { n: 0, ok: 0 }; o.n++; if (r.correct) o.ok++; q.set(r.q_index, o); });
+  $('#tc-quiz').innerHTML = '<tr><th>題號</th><td>作答人數</td><td>首答答對率</td><th>題目</th></tr>' + ([...q.keys()].sort((a, b) => a - b).map(i => `<tr><th>${i + 1}</th><td>${q.get(i).n}</td><td>${pct(q.get(i).ok, q.get(i).n)}</td><th style="white-space:normal;font-weight:400">${escH(QUIZ[i] ? QUIZ[i].q : '')}</th></tr>`).join('') || '<tr><th>尚無紀錄</th></tr>');
+  $('#tc-ai').innerHTML = d.ai.slice(0, 30).map(r => `<details><summary>${tcTime(r.created_at)}　${escH(r.student_id)}　${escH(r.group_code || '')}　${escH(r.mode || '')}${r.correction ? '　有修正' : ''}</summary><p style="white-space:pre-wrap;font-size:13px"><b>問：</b>${escH(String(r.prompt || '').slice(0, 600))}\n\n<b>AI：</b>${escH(String(r.ai_answer || '').slice(0, 1500))}${r.correction ? '\n\n<b>學生修正：</b>' + escH(r.correction) : ''}</p></details>`).join('') || '<p class="hint">尚無紀錄</p>';
+  $('#tc-body').hidden = false; }
+function tcCsv(kind) { const d = tcData; if (!d) return; let rows;
+  if (kind === 'students') rows = [['學號', '組別', '測驗已答題數', '首答答對題數', '審查演練次數', '抓到', '漏掉', '誤判', 'AI紀錄筆數', '有填修正筆數', '最後活動']].concat(tcStudents(d).map(x => [x.sid, x.grp, x.answered, x.right, x.runs, x.hit, x.miss, x.fa, x.ai, x.fix, x.last]));
+  else if (kind === 'quiz') rows = [['時間', '學號', '組別', '題號', '選項', '是否答對']].concat(d.quiz.map(r => [r.created_at, r.student_id, r.group_code, r.q_index + 1, r.chosen + 1, r.correct ? 1 : 0]));
+  else if (kind === 'review') rows = [['時間', '學號', '組別', '案件', '抓到', '漏掉', '誤判', '勾選項目']].concat(d.review.map(r => [r.created_at, r.student_id, r.group_code, r.case_key, r.hit, r.miss, r.false_alarm, (r.picked || []).join(' ')]));
+  else if (kind === 'ai') rows = [['時間', '學號', '組別', '模式', '提問', 'AI回答', '學生修正']].concat(d.ai.map(r => [r.created_at, r.student_id, r.group_code, r.mode, r.prompt, r.ai_answer, r.correction]));
+  else rows = [['組別', '最後儲存者', '最後儲存時間', '參數(JSON)']].concat(d.cases.map(r => [r.group_code, r.updated_by, r.updated_at, JSON.stringify(r.data)]));
+  const cell = v => { let t = String(v ?? ''); if (/^[=+\-@]/.test(t)) t = "'" + t; return /[",\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; }; // 開頭加單引號，避免 Excel 把學生輸入當公式
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + rows.map(r => r.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' })); a.download = '檢核教室_' + kind + '_' + new Date().toISOString().slice(0, 10) + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+function tcInit() { const msg = $('#tc-msg');
+  $('#tc-link').onclick = e => { e.preventDefault(); go('teacher'); };
+  $('#tc-load').onclick = async () => { const pw = $('#tc-pass').value; if (!SB.url) { msg.textContent = '此版本未連線資料庫。'; return; } if (pw.length < 10) { msg.textContent = '請輸入教師密碼（至少 10 個字）。'; return; }
+    msg.textContent = '讀取中…';
+    try { const d = await sb('rpc/teacher_data', { p_pass: pw }); if (!d || !d.quiz) throw new Error('沒有回傳資料');
+      tcData = { quiz: d.quiz || [], review: d.review || [], ai: d.ai || [], cases: d.cases || [] }; tcRender(); msg.textContent = `已讀取：測驗 ${tcData.quiz.length} 筆、審查演練 ${tcData.review.length} 筆、AI 紀錄 ${tcData.ai.length} 筆、組參數 ${tcData.cases.length} 組。`; }
+    catch (e) { msg.textContent = /wrong password/.test(e.message) ? '密碼不正確。' : /404|PGRST202|teacher_data/.test(e.message) ? '資料庫還沒有建立教師頁用的函式，請先在 Supabase 執行 teacher.sql。' : '讀取失敗：' + e.message; } };
+  $$('[data-csv]').forEach(b => b.onclick = () => tcCsv(b.dataset.csv)); }
+document.addEventListener('DOMContentLoaded', tcInit);
 function setMsg(t) { const el = document.querySelector('#who-msg'); if (el) el.textContent = t; }
 function initCloud() {
   const sid = document.querySelector('#who-sid'), grp = document.querySelector('#who-grp');
